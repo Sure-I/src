@@ -20,13 +20,18 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 
 import classes.STParser.All_var_declsContext;
+import classes.STParser.Decl_common_partContext;
+import classes.STParser.Elem_type_nameContext;
+import classes.STParser.Variable_listContext;
 
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 /* import org.eclipse.emf.ecore.xmi.impl.XMIResourceFactoryImpl; */
 
 import st.basics.*;
 import st.elements.*;
 import st.literals.*;
+import st.initializer.*;
 import st.types.*;
 import st.variables.*;
 import st.pous.*;
@@ -41,6 +46,7 @@ public class MyListener extends STBaseListener{
 /* ///引入EMF模型的factory方法，用于给节点创建语言模型实例 */
     ElementsFactory elemFactory = ElementsFactory.eINSTANCE;
     LiteralsFactory liteFactory = LiteralsFactory.eINSTANCE;
+    InitializerFactory initFactory = InitializerFactory.eINSTANCE;
     TypesFactory typeFactory = TypesFactory.eINSTANCE;
     VariablesFactory varFactory = VariablesFactory.eINSTANCE;
     PousFactory pouFactory = PousFactory.eINSTANCE;
@@ -404,8 +410,8 @@ public class MyListener extends STBaseListener{
 
 /* ////////////////////////////////////////////////////////
 //////以下是关于variable的部分
-//////
-//////
+//////all_var_decls节点会实例化为VariableDeclaration类的对象
+//////子节点关联到父节点的实例化对象，然后在子节点中根据节点名来设置其中的section
 ////// */
     @Override public void enterAll_var_decls(STParser.All_var_declsContext ctx) { 
         VariableDeclaration emf = declFactory.createVariableDeclaration();
@@ -414,7 +420,7 @@ public class MyListener extends STBaseListener{
 
     @Override public void exitAll_var_decls(STParser.All_var_declsContext ctx) { 
         String str = ((VariableDeclaration)mapEmf.get(ctx)).getTestString();
-        System.out.println(str);
+/*         System.out.println(str); */
     }
 
     @Override public void enterIo_var_decls(STParser.Io_var_declsContext ctx) { 
@@ -491,12 +497,83 @@ public class MyListener extends STBaseListener{
 
     @Override public void exitVar_temp_decls(STParser.Var_temp_declsContext ctx) { }
 
-    @Override public void enterVar_access_decls(STParser.Var_access_declsContext ctx) { }
+    @Override public void enterVar_access_decls(STParser.Var_access_declsContext ctx) { 
+        ParserRuleContext parentNode = ctx.getParent();
+        VariableDeclaration emf = (VariableDeclaration)mapEmf.get(parentNode);
+        mapEmf.put(ctx, emf);
+        emf.setSection(VariableSection.VAR_ACCESS);
+    }
 
     @Override public void exitVar_access_decls(STParser.Var_access_declsContext ctx) { }
 
-    @Override public void enterVar_local_decls(STParser.Var_local_declsContext ctx) { }
+    @Override public void enterVar_local_decls(STParser.Var_local_declsContext ctx) { 
+
+    }
 
     @Override public void exitVar_local_decls(STParser.Var_local_declsContext ctx) { }
 
+    @Override public void enterVariable_list(STParser.Variable_listContext ctx) { 
+        VariableList emf = varFactory.createVariableList();
+        mapEmf.put(ctx, emf);
+    }
+
+	@Override public void exitVariable_list(STParser.Variable_listContext ctx) { }
+
+/* ////////////////////////////////////////////////////////
+//////以下是关于initiate的部分
+//////
+//////
+////// */
+    @Override public void enterDecl_common_part(STParser.Decl_common_partContext ctx) { }
+
+    @Override public void exitDecl_common_part(STParser.Decl_common_partContext ctx) {
+        VariableInitializer emf = (VariableInitializer)mapEmf.get(ctx); 
+        //String testString = emf.getTestString();
+        //System.out.println(testString);
+        ParserRuleContext parentNode = ctx.getParent();
+        VariableDeclaration parentEmf = (VariableDeclaration)mapEmf.get(parentNode);
+        emf.setDeclaration(parentEmf);
+        parentEmf.getInitializer().add(emf);
+        
+        Variable_listContext variableListNode = (Variable_listContext)ctx.getChild(0);
+        VariableList variableListEmf = (VariableList)mapEmf.get(variableListNode);
+        emf.setVariableList(variableListEmf);
+    }
+
+    @Override public void enterSimple_spec_init(STParser.Simple_spec_initContext ctx) { 
+        VariableInitializer emf = initFactory.createVariableInitializer();
+        mapEmf.put(ctx, emf);
+        //emf.setTestString("simple");
+
+        ParserRuleContext parentNode = ctx.getParent();
+        String parentNodeStr = mapNodeStr.get(parentNode);
+        switch(parentNodeStr){
+            case "decl_common_part":
+                mapEmf.put(parentNode, emf);
+                break;
+        }
+    }
+
+    @Override public void exitSimple_spec_init(STParser.Simple_spec_initContext ctx) { 
+        VariableInitializer emf = (VariableInitializer)mapEmf.get(ctx);
+        Elem_type_nameContext typeNode = (Elem_type_nameContext)ctx.getChild(0);
+        Type typeEmf = (Type)mapEmf.get(typeNode);
+        emf.setType(typeEmf);
+    }
+
+    @Override public void enterStruct_spec_init(STParser.Struct_spec_initContext ctx) { 
+        VariableInitializer emf = initFactory.createVariableInitializer();
+        mapEmf.put(ctx, emf);
+        //emf.setTestString("struct");
+
+        ParserRuleContext parentNode = ctx.getParent();
+        String parentNodeStr = mapNodeStr.get(parentNode);
+        switch(parentNodeStr){
+            case "decl_common_part":
+                mapEmf.put(parentNode, emf);
+                break;
+        }
+    }
+
+	@Override public void exitStruct_spec_init(STParser.Struct_spec_initContext ctx) { }
 }
