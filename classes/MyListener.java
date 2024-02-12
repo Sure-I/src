@@ -23,6 +23,7 @@ import classes.STParser.All_var_declsContext;
 import classes.STParser.Decl_common_partContext;
 import classes.STParser.Elem_type_nameContext;
 import classes.STParser.Variable_listContext;
+import classes.STParser.Variable_nameContext;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
@@ -54,15 +55,6 @@ public class MyListener extends STBaseListener{
     ExpressionsFactory exprFactory = ExpressionsFactory.eINSTANCE;
     StatementsFactory statFactory = StatementsFactory.eINSTANCE;
 
-/* ///使用HashMap数据结构来存储EMF模型对象，key为语法树节点，value为实例化的EMF模型
-//////并且按照EMF包结构进行划分，便于在创建reference时进行关联 */
-/*     public Map<ParseTree, EObject> mapTypeEmf = new HashMap<>();
-    public Map<ParseTree, EObject> mapVarEmf = new HashMap<>();
-    public Map<ParseTree, EObject> mapPouEmf = new HashMap<>();
-    public Map<ParseTree, EObject> mapDeclEmf = new HashMap<>();
-    public Map<ParseTree, EObject> mapEmf = new HashMap<>();
-    public Map<ParseTree, EObject> mapStatEmf = new HashMap<>(); */
-
 
 /* ///实例化过程使用两个HashMap
 //////mapEmf用来存储ctx对应的实例化的对象，mapRuleName用来存储ctx的对应的字符串
@@ -70,6 +62,11 @@ public class MyListener extends STBaseListener{
     public Map<ParseTree, EObject> mapEmf = new HashMap<>();
     public Map<ParseTree, String> mapNodeStr = new HashMap<>();
 
+//////用一个HashMap来记录所有的变量声明，用于在引用变量时快速查找
+    public Map<String, EObject> mapVarEmf = new HashMap<>();
+
+//////用一个HashMap来记录所有使用到的类型emf，包括自定义的类型和基本数据类型
+    public Map<String, EObject> mapTypeEmf = new HashMap<>();
 
 /* ///获取ruleNode的规则名 */
     @Override public void enterEveryRule(ParserRuleContext ctx) { 
@@ -124,7 +121,7 @@ public class MyListener extends STBaseListener{
 
         }
         else if(childNode instanceof TerminalNode){
-/*             System.out.println("1"); */
+            //System.out.println("1");
             TerminalNode tNode = (TerminalNode)childNode;
             UnaryExpression emf = exprFactory.createUnaryExpression();
             mapEmf.put(ctx, emf);
@@ -133,7 +130,7 @@ public class MyListener extends STBaseListener{
             String nodeStr = mapNodeStr.get(tNode);
             switch(nodeStr){
                 case "(":
-/*                     System.out.println("PARETHESES"); */
+                    //System.out.println("PARETHESES");
                     emf.setOperator(UnaryOperator.PARENTHESES);
                     break;
                 case "^":
@@ -282,7 +279,7 @@ public class MyListener extends STBaseListener{
         }
         String value = ((Literal)mapEmf.get(ctx.getChild(0))).getValue();
         emf.setValue(value);
-/*         System.out.println(value); */
+        //System.out.println(value);
 
     }
 
@@ -292,7 +289,7 @@ public class MyListener extends STBaseListener{
         Literal emf = elemFactory.createLiteral();
         mapEmf.put(ctx, emf);
         String value = ctx.getText();
-/*         System.out.println(value); */
+        //System.out.println(value);
         emf.setValue(value);
     }
 
@@ -343,69 +340,176 @@ public class MyListener extends STBaseListener{
     }
 
     @Override public void exitElem_type_name(STParser.Elem_type_nameContext ctx) { 
-        ElementaryDataType emf = typeFactory.createElementaryDataType();
-        mapEmf.put(ctx, emf);
-        String typeName = ctx.getText();
-        switch(typeName){
-            case "BOOL":
-/*                 System.out.println(typeName); */
-                emf.setName(typeName);
-                emf.setType(PreDefinedEDType.BOOL);
-                break;
-            case "SINT":
-                emf.setName(typeName);
-                emf.setType(PreDefinedEDType.SINT);
-                break;
-            case "INT":
-                emf.setName(typeName);
-                emf.setType(PreDefinedEDType.INT);
-                break;
-/*             case "":
-                emf.setName(typeName);
-                emf.setType(PreDefinedEDType.);
-                break;
-            case "":
-                emf.setName(typeName);
-                emf.setType(PreDefinedEDType.);
-                break;
-            case "":
-                emf.setName(typeName);
-                emf.setType(PreDefinedEDType.);
-                break;
-            case "":
-                emf.setName(typeName);
-                emf.setType(PreDefinedEDType.);
-                break;
-            case "":
-                emf.setName(typeName);
-                emf.setType(PreDefinedEDType.);
-                break;
-            case "":
-                emf.setName(typeName);
-                emf.setType(PreDefinedEDType.);
-                break;
-            case "":
-                emf.setName(typeName);
-                emf.setType(PreDefinedEDType.);
-                break;
-            case "":
-                emf.setName(typeName);
-                emf.setType(PreDefinedEDType.);
-                break;
-            case "":
-                emf.setName(typeName);
-                emf.setType(PreDefinedEDType.);
-                break; */
+        ParseTree childNode = ctx.getChild(0);
+        if(childNode instanceof TerminalNode){
+            String typeName = ctx.getText();
+            if(mapTypeEmf.get(typeName) == null){
+                ElementaryDataType emf = typeFactory.createElementaryDataType();
+                mapEmf.put(ctx, emf);
+                mapTypeEmf.put(typeName, emf);
+                switch(typeName){
+                    case "BOOL":
+                        //System.out.println(typeName);
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.BOOL);
+                        break;
+                    case "SINT":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.SINT);
+                        break;
+                    case "INT":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.INT);
+                        break;
+                    case "DINT":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.DINT);
+                        break;
+                    case "LINT":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.LINT);
+                        break;
+                    case "USINT":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.USINT);
+                        break;
+                    case "UINT":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.UINT);
+                        break;
+                    case "UDINT":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.UDINT);
+                        break;
+                    case "ULINT":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.ULINT);
+                        break;
+                    case "REAL":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.REAL);
+                        break;
+                    case "LREAL":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.LREAL);
+                        break;
+                    case "TIME":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.TIME);
+                        break;
+                    case "LTIME":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.LTIME);
+                        break;
+                    case "DATE":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.DATE);
+                        break;
+                    case "LDATE":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.LDATE);
+                        break;
+                    case "TOD":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.TOD);
+                        break;
+                    case "LTOD":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.LTOD);
+                        break;
+                    case "DT":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.DT);
+                        break;
+                    case "LDT":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.LDT);
+                        break;
+                    case "CHAR":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.CHAR);
+                        break;
+                    case "WCHAR":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.WCHAR);
+                        break;
+                    case "BYTE":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.BYTE);
+                        break;
+                    case "WORD":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.WORD);
+                        break;
+                    case "DWORD":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.DWORD);
+                        break;
+                    case "LWORD":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.LWORD);
+                        break;
+/*                     case "":
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.);
+                        break; */
+                    default: System.out.println("Input Error!");
+                }
+            }
+            else{
+                ElementaryDataType emf = (ElementaryDataType)mapTypeEmf.get(typeName);
+                mapEmf.put(ctx, emf);
+            }
+        }
+        else{
+            String typeName = childNode.getText();
+            if(mapTypeEmf.get(typeName) == null){
+                switch (typeName) {
+                    case "STRING":
+                        ElementaryDataType emf = typeFactory.createElementaryDataType();
+                        mapEmf.put(ctx, emf);
+                        mapEmf.put(childNode, emf);
+                        mapTypeEmf.put(typeName, emf);
+                        emf.setName(typeName);
+                        emf.setType(PreDefinedEDType.STRING);
+                        break;
+                    case "WSTRING":
+                        ElementaryDataType emf1 = typeFactory.createElementaryDataType();
+                        mapEmf.put(ctx, emf1);
+                        mapEmf.put(childNode, emf1);
+                        mapTypeEmf.put(typeName, emf1);
+                        emf1.setName(typeName);
+                        emf1.setType(PreDefinedEDType.WSTRING);
+                        break;                      
+                    default:
+                        UserDefinedDataType emf2 = typeFactory.createUserDefinedDataType();
+                        TypeDeclaration emf3 = declFactory.createTypeDeclaration();
+                        emf2.setTypeDeclaration(emf3);
+                        mapEmf.put(ctx, emf2);
+                        mapEmf.put(childNode, emf2);
+                        mapTypeEmf.put(typeName, emf2);
+                        emf2.setName(typeName);
+                }
+            }
+            else{
+                EObject emf = mapTypeEmf.get(typeName);
+                mapEmf.put(ctx, emf);
+                mapEmf.put(childNode, emf);
+            }
         }
     }
 
-    @Override public void enterDerived_type_access(STParser.Derived_type_accessContext ctx) { 
+    @Override public void enterDerived_type_access(STParser.Derived_type_accessContext ctx) { }
 
-    }
+    @Override public void exitDerived_type_access(STParser.Derived_type_accessContext ctx) { }
 
-    @Override public void exitDerived_type_access(STParser.Derived_type_accessContext ctx) { 
-        
-    }
+    @Override public void enterType_access(STParser.Type_accessContext ctx) { }
+
+	@Override public void exitType_access(STParser.Type_accessContext ctx) { }
+
+    @Override public void enterType_name(STParser.Type_nameContext ctx) { }
+
+	@Override public void exitType_name(STParser.Type_nameContext ctx) { }
 
 
 /* ////////////////////////////////////////////////////////
@@ -419,8 +523,8 @@ public class MyListener extends STBaseListener{
     }
 
     @Override public void exitAll_var_decls(STParser.All_var_declsContext ctx) { 
-        String str = ((VariableDeclaration)mapEmf.get(ctx)).getTestString();
-/*         System.out.println(str); */
+        //String str = ((VariableDeclaration)mapEmf.get(ctx)).getTestString();
+        //System.out.println(str);
     }
 
     @Override public void enterIo_var_decls(STParser.Io_var_declsContext ctx) { 
@@ -506,9 +610,7 @@ public class MyListener extends STBaseListener{
 
     @Override public void exitVar_access_decls(STParser.Var_access_declsContext ctx) { }
 
-    @Override public void enterVar_local_decls(STParser.Var_local_declsContext ctx) { 
-
-    }
+    @Override public void enterVar_local_decls(STParser.Var_local_declsContext ctx) { }
 
     @Override public void exitVar_local_decls(STParser.Var_local_declsContext ctx) { }
 
@@ -517,7 +619,46 @@ public class MyListener extends STBaseListener{
         mapEmf.put(ctx, emf);
     }
 
-	@Override public void exitVariable_list(STParser.Variable_listContext ctx) { }
+	@Override public void exitVariable_list(STParser.Variable_listContext ctx) { 
+        VariableList emf = (VariableList)mapEmf.get(ctx);
+        for(int i = 0; i < ctx.getChildCount(); i++){
+            ParseTree childNode = ctx.getChild(i);
+            if(childNode instanceof Variable_nameContext){
+                Variable varEmf = (Variable)mapEmf.get(childNode);
+                emf.getVariable().add(varEmf);
+            }
+        }
+    }
+
+    @Override public void enterVariable_name(STParser.Variable_nameContext ctx) { }
+
+	@Override public void exitVariable_name(STParser.Variable_nameContext ctx) { 
+        ParserRuleContext parentNode = ctx.getParent();
+        String parentNodeStr = mapNodeStr.get(parentNode);
+        switch(parentNodeStr){
+            case "variable_list":
+                VariableList parentEmf = (VariableList)mapEmf.get(parentNode);
+
+                Variable emf = elemFactory.createVariable();
+                mapEmf.put(ctx, emf);
+                emf.setVariableList(parentEmf);
+
+                String name = ctx.getText();
+                emf.setName(name);
+                mapVarEmf.put(name, emf);
+                break;
+            case "var_access":
+
+                break;
+            case "loc_var_decl":
+                
+                break;
+            case "loc_partly_var":
+                
+                break;
+            default: System.out.println("Input Error!");
+        }
+    }
 
 /* ////////////////////////////////////////////////////////
 //////以下是关于initiate的部分
@@ -526,18 +667,35 @@ public class MyListener extends STBaseListener{
 ////// */
     @Override public void enterDecl_common_part(STParser.Decl_common_partContext ctx) { }
 
+
+    ////decl_common_part的实例化对象为Initializer，实例化步骤在子节点中进行完成，本节点中进行关联
+    ////在exit中完成容器declaration以及属性variableList的设定，并且完成VariableList对象和Variable对象的属性设置
     @Override public void exitDecl_common_part(STParser.Decl_common_partContext ctx) {
         VariableInitializer emf = (VariableInitializer)mapEmf.get(ctx); 
+        Type typeEmf = emf.getType();
         //String testString = emf.getTestString();
         //System.out.println(testString);
+
         ParserRuleContext parentNode = ctx.getParent();
         VariableDeclaration parentEmf = (VariableDeclaration)mapEmf.get(parentNode);
         emf.setDeclaration(parentEmf);
         parentEmf.getInitializer().add(emf);
-        
+
         Variable_listContext variableListNode = (Variable_listContext)ctx.getChild(0);
         VariableList variableListEmf = (VariableList)mapEmf.get(variableListNode);
+        variableListEmf.setInitializer(emf);
+        variableListEmf.setType(typeEmf);
         emf.setVariableList(variableListEmf);
+
+        for(int i = 0; i < variableListNode.getChildCount(); i++){
+            ParseTree childNode = variableListNode.getChild(i);
+            if(childNode instanceof Variable_nameContext){
+                Variable varEmf = (Variable)mapEmf.get(childNode);
+                varEmf.setType(typeEmf);
+                System.out.println(varEmf.getName());
+                System.out.println(varEmf.getType().getName());
+            }
+        }
     }
 
     @Override public void enterSimple_spec_init(STParser.Simple_spec_initContext ctx) { 
@@ -551,6 +709,15 @@ public class MyListener extends STBaseListener{
             case "decl_common_part":
                 mapEmf.put(parentNode, emf);
                 break;
+            case "simple_type_decl":
+
+                break;
+            case "struct_elem_decl":
+
+                break;
+            case "loc_var_spec_init":
+
+                break;
         }
     }
 
@@ -559,6 +726,11 @@ public class MyListener extends STBaseListener{
         Elem_type_nameContext typeNode = (Elem_type_nameContext)ctx.getChild(0);
         Type typeEmf = (Type)mapEmf.get(typeNode);
         emf.setType(typeEmf);
+
+        if(ctx.getChildCount() == 3){
+            Expression exprEmf = (Expression)mapEmf.get(ctx.getChild(2));
+            emf.setValue(exprEmf);
+        }
     }
 
     @Override public void enterStruct_spec_init(STParser.Struct_spec_initContext ctx) { 
