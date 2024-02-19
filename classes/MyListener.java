@@ -53,7 +53,7 @@ public class MyListener extends STBaseListener{
     PousFactory pouFactory = PousFactory.eINSTANCE;
     DeclarationsFactory declFactory = DeclarationsFactory.eINSTANCE;
     ExpressionsFactory exprFactory = ExpressionsFactory.eINSTANCE;
-    StatementsFactory statFactory = StatementsFactory.eINSTANCE;
+    StatementsFactory stmtFactory = StatementsFactory.eINSTANCE;
 
 
 /* ///实例化过程使用两个HashMap
@@ -239,6 +239,68 @@ public class MyListener extends STBaseListener{
 //////以下是关于statement的部分
 //////
 ////// */
+
+    @Override public void enterStmt(STParser.StmtContext ctx) { }
+
+    @Override public void exitStmt(STParser.StmtContext ctx) { 
+        Statement emf = (Statement)mapEmf.get(ctx.getChild(0));
+        mapEmf.put(ctx, emf);
+    }
+
+    @Override public void enterSelection_stmt(STParser.Selection_stmtContext ctx) { }
+
+	@Override public void exitSelection_stmt(STParser.Selection_stmtContext ctx) { 
+        Statement emf = (Statement)mapEmf.get(ctx.getChild(0));
+        mapEmf.put(ctx, emf);
+    }
+
+    @Override public void enterIteration_stmt(STParser.Iteration_stmtContext ctx) { }
+
+	@Override public void exitIteration_stmt(STParser.Iteration_stmtContext ctx) { 
+        Statement emf = (Statement)mapEmf.get(ctx.getChild(0));
+        mapEmf.put(ctx, emf);
+    }
+
+    @Override public void enterStmt_list(STParser.Stmt_listContext ctx) { }
+
+    @Override public void exitStmt_list(STParser.Stmt_listContext ctx) { 
+        StatementBody emf = stmtFactory.createStatementBody();
+        mapEmf.put(ctx, emf);
+        for(int i = 0; i < ctx.getChildCount(); i++){
+            Statement childEmf = (Statement)mapEmf.get(ctx.getChild(i));
+            emf.getStatement().add(childEmf);
+        }
+    }
+
+    @Override public void enterIf_stmt(STParser.If_stmtContext ctx) { }
+
+    @Override public void exitIf_stmt(STParser.If_stmtContext ctx) { 
+        IfStatement emf = stmtFactory.createIfStatement();
+        mapEmf.put(ctx, emf);
+        for(int i = 0; i < ctx.getChildCount(); i++){
+            ParseTree childNode = ctx.getChild(i);
+            String childNodeStr = mapNodeStr.get(ctx.getChild(i));
+            switch(childNodeStr){
+                case "expression":
+                    Expression emf0 = (Expression)mapEmf.get(childNode);
+                    emf.setCondition(emf0);
+                    break;
+                case "stmt_list":
+                    StatementBody emf1 = (StatementBody)mapEmf.get(childNode);
+                    emf.setThenStatement(emf1);
+                    break;
+                case "elsif_stmt":
+                    IfStatement emf2 = (IfStatement)mapEmf.get(childNode);
+                    emf.getElseIfStatement().add(emf2);
+                    break;
+                case "else_stmt":
+                    StatementBody emf3 = (StatementBody)mapEmf.get(childNode);
+                    emf.setElseStatement(emf3); 
+                    break;
+                default: ;
+            }
+        }
+    }
 
 /* ////////////////////////////////////////////////////////////////////////
 //////以下是关于constant的部分
@@ -692,8 +754,8 @@ public class MyListener extends STBaseListener{
             if(childNode instanceof Variable_nameContext){
                 Variable varEmf = (Variable)mapEmf.get(childNode);
                 varEmf.setType(typeEmf);
-                System.out.println(varEmf.getName());
-                System.out.println(varEmf.getType().getName());
+                //System.out.println(varEmf.getName());
+                //System.out.println(varEmf.getType().getName());
             }
         }
     }

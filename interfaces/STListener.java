@@ -1,6 +1,6 @@
 package interfaces;
 
-import classes.*;
+import 	classes.*;
 // Generated from .//ST.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -419,6 +419,26 @@ public interface STListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitIf_stmt(STParser.If_stmtContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link STParser#elsif_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void enterElsif_stmt(STParser.Elsif_stmtContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link STParser#elsif_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void exitElsif_stmt(STParser.Elsif_stmtContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link STParser#else_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void enterElse_stmt(STParser.Else_stmtContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link STParser#else_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void exitElse_stmt(STParser.Else_stmtContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link STParser#case_stmt}.
 	 * @param ctx the parse tree
