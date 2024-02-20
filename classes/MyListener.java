@@ -146,6 +146,7 @@ public class MyListener extends STBaseListener{
                 case "NOT":
                     emf.setOperator(UnaryOperator.COMPLEMENT);
                     break;
+                default: System.out.println("expression error!!!");
             }
 
 
@@ -208,6 +209,7 @@ public class MyListener extends STBaseListener{
                 case "OR":
                     emf.setOperator(BinaryOperator.BOOLEAN_OR);
                     break;
+                default: System.out.println("expression error!!!");
             }
 
         }
@@ -339,7 +341,7 @@ public class MyListener extends STBaseListener{
                     StatementBody emf1 = (StatementBody)mapEmf.get(childNode);
                     emf.setThenStatement(emf1);
                     break;
-                default: ;
+                default: System.out.println("elsif_stmt error!!!");;
             }
         }
     }
@@ -595,7 +597,7 @@ public class MyListener extends STBaseListener{
                         emf.setName(typeName);
                         emf.setType(PreDefinedEDType.);
                         break; */
-                    default: System.out.println("Input Error!");
+                    default: System.out.println("elem_type_name Error!");
                 }
             }
             else{
