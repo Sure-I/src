@@ -247,7 +247,7 @@ public class MyListener extends STBaseListener{
         mapEmf.put(ctx, emf);
     }
 
-    @Override public void enterSelection_stmt(STParser.Selection_stmtContext ctx) { }
+/*     @Override public void enterSelection_stmt(STParser.Selection_stmtContext ctx) { }
 
 	@Override public void exitSelection_stmt(STParser.Selection_stmtContext ctx) { 
         Statement emf = (Statement)mapEmf.get(ctx.getChild(0));
@@ -270,9 +270,9 @@ public class MyListener extends STBaseListener{
             Statement childEmf = (Statement)mapEmf.get(ctx.getChild(i));
             emf.getStatement().add(childEmf);
         }
-    }
+    } */
 
-    @Override public void enterIf_stmt(STParser.If_stmtContext ctx) { }
+/*     @Override public void enterIf_stmt(STParser.If_stmtContext ctx) { }
 
     @Override public void exitIf_stmt(STParser.If_stmtContext ctx) { 
         IfStatement emf = stmtFactory.createIfStatement();
@@ -300,7 +300,38 @@ public class MyListener extends STBaseListener{
                 default: ;
             }
         }
-    }
+    } */
+
+/*     @Override public void enterAssign_stmt(STParser.Assign_stmtContext ctx) { }
+
+	@Override public void exitAssign_stmt(STParser.Assign_stmtContext ctx) { 
+        String childNodeStr = mapNodeStr.get(ctx.getChild(0));
+        switch(childNodeStr){
+            case "variale": 
+                AssignmentStatement emf0 = stmtFactory.createAssignmentStatement();
+                mapEmf.put(ctx, emf0);
+                for(int i = 0; i < ctx.getChildCount(); i++){
+                    ParseTree childNode = ctx.getChild(i);
+                    EObject childEmf = mapEmf.get(ctx.getChild(i));
+                    if(childNode instanceof Variable){
+                        Variable childEmf0 = (Variable)childEmf;
+                        emf0.setVariable(childEmf0);
+                    }
+                    else if(childNode instanceof Expression){
+                        Expression childEmf1 = (Expression)childEmf;
+                        emf0.setExpression(childEmf1);
+                    }
+                    else{ }
+                }
+                break;
+            case "ref_assign": 
+
+                break;
+            case "assignment_attempt": 
+
+                break;
+        }
+    } */
 
 /* ////////////////////////////////////////////////////////////////////////
 //////以下是关于constant的部分
@@ -321,8 +352,8 @@ public class MyListener extends STBaseListener{
     @Override public void exitNumeric_literal(STParser.Numeric_literalContext ctx) { 
         NumericLiteral emf = liteFactory.createNumericLiteral();
         mapEmf.put(ctx, emf);
-        String nodeStr = mapNodeStr.get(ctx.getChild(0));
-        switch(nodeStr){
+        String childNodeStr = mapNodeStr.get(ctx.getChild(0));
+        switch(childNodeStr){
             case "int_literal": 
                 emf.setType(LiteralType.INTEGER);
                 break;
@@ -722,6 +753,61 @@ public class MyListener extends STBaseListener{
         }
     }
 
+/*     @Override public void enterVariable(STParser.VariableContext ctx) { }
+
+	@Override public void exitVariable(STParser.VariableContext ctx) { 
+        ParseTree childNode = ctx.getChild(0);
+        String childNodeStr = mapNodeStr.get(childNode);
+        switch(childNodeStr){
+            case "symbolic_variable":
+                Variable emf0 = (Variable)mapEmf.get(childNode);
+                mapEmf.put(ctx, emf0);
+                break;
+            default: ;
+        }
+    }
+
+    @Override public void enterSymbolic_variable(STParser.Symbolic_variableContext ctx) { }
+
+	@Override public void exitSymbolic_variable(STParser.Symbolic_variableContext ctx) {
+        for(int i = 0; i < ctx.getChildCount(); i++){ 
+            ParseTree childNode = ctx.getChild(0);
+            String childNodeStr = mapNodeStr.get(childNode);
+            switch(childNodeStr){
+                case "namespace_name":
+
+                    break;
+                case "var_access":
+                    Variable emf0 = (Variable)mapEmf.get(childNode);
+                    mapEmf.put(ctx, emf0);
+                    break;
+                case "multi_elem_var":
+
+                    break;
+                default: ;
+            }
+        }
+    }
+
+    @Override public void enterVar_access(STParser.Var_accessContext ctx) { }
+
+	@Override public void exitVar_access(STParser.Var_accessContext ctx) { 
+        ParseTree childNode = ctx.getChild(0);
+        String childNodeStr = mapNodeStr.get(childNode);
+        switch(childNodeStr){
+            case "variable_name":
+                String varName = childNode.getText();
+                Variable emf0 = (Variable)mapVarEmf.get(varName);
+                mapEmf.put(ctx, emf0);
+                break;
+            case "ref_deref":
+
+                break;
+            default: System.out.println("Input Error!");
+        }
+    } */
+
+
 /* ////////////////////////////////////////////////////////
 //////以下是关于initiate的部分
 //////
@@ -754,8 +840,8 @@ public class MyListener extends STBaseListener{
             if(childNode instanceof Variable_nameContext){
                 Variable varEmf = (Variable)mapEmf.get(childNode);
                 varEmf.setType(typeEmf);
-                //System.out.println(varEmf.getName());
-                //System.out.println(varEmf.getType().getName());
+                System.out.println(varEmf.getName());
+                System.out.println(varEmf.getType().getName());
             }
         }
     }
