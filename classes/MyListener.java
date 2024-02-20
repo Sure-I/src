@@ -22,6 +22,7 @@ import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import classes.STParser.All_var_declsContext;
 import classes.STParser.Decl_common_partContext;
 import classes.STParser.Elem_type_nameContext;
+import classes.STParser.StmtContext;
 import classes.STParser.Variable_listContext;
 import classes.STParser.Variable_nameContext;
 
@@ -121,10 +122,10 @@ public class MyListener extends STBaseListener{
 
         }
         else if(childNode instanceof TerminalNode){
-            //System.out.println("1");
             TerminalNode tNode = (TerminalNode)childNode;
             UnaryExpression emf = exprFactory.createUnaryExpression();
             mapEmf.put(ctx, emf);
+            emf.setTestString("unary_expr_emf");
 
             emf.setExpression( (Expression)mapEmf.get(ctx.getChild(1)) );
             String nodeStr = mapNodeStr.get(tNode);
@@ -150,10 +151,10 @@ public class MyListener extends STBaseListener{
 
         }
         else if( mapNodeStr.get(ctx.getChild(0)) == "expression" ){
-/*             System.out.println("2"); */
             BinaryExpression emf = exprFactory.createBinaryExpression();
             mapEmf.put(ctx, emf);
 
+            emf.setTestString("binary_expr_emf");
             emf.setFirstExpression( (Expression)mapEmf.get(ctx.getChild(0)) );
             emf.setSecondExpression( (Expression)mapEmf.get(ctx.getChild(2)) );
 
@@ -246,25 +247,32 @@ public class MyListener extends STBaseListener{
         Statement emf = (Statement)mapEmf.get(ctx.getChild(0));
         mapEmf.put(ctx, emf);
         if(emf instanceof AssignmentStatement){
-            AssignmentStatement emf0 = (AssignmentStatement)emf;
-            //String varName = emf0.getVariable().getName();
-            //System.out.println(varName);
+/*             AssignmentStatement emf0 = (AssignmentStatement)emf;
+            String testString0 = emf0.getTestString();
+            System.out.println(testString0); */
+        }
+        else if(emf instanceof IfStatement){
+            IfStatement emf1 = (IfStatement)emf;
+            String testString1 = emf1.getTestString();
+            String condition = emf1.getCondition().getTestString();
+            System.out.println(testString1);
+            System.out.println(condition);
         }
     }
 
-/*     @Override public void enterSelection_stmt(STParser.Selection_stmtContext ctx) { }
+    @Override public void enterSelection_stmt(STParser.Selection_stmtContext ctx) { }
 
 	@Override public void exitSelection_stmt(STParser.Selection_stmtContext ctx) { 
         Statement emf = (Statement)mapEmf.get(ctx.getChild(0));
         mapEmf.put(ctx, emf);
     }
 
-    @Override public void enterIteration_stmt(STParser.Iteration_stmtContext ctx) { }
+/*     @Override public void enterIteration_stmt(STParser.Iteration_stmtContext ctx) { }
 
 	@Override public void exitIteration_stmt(STParser.Iteration_stmtContext ctx) { 
         Statement emf = (Statement)mapEmf.get(ctx.getChild(0));
         mapEmf.put(ctx, emf);
-    }
+    } */
 
     @Override public void enterStmt_list(STParser.Stmt_listContext ctx) { }
 
@@ -272,15 +280,21 @@ public class MyListener extends STBaseListener{
         StatementBody emf = stmtFactory.createStatementBody();
         mapEmf.put(ctx, emf);
         for(int i = 0; i < ctx.getChildCount(); i++){
-            Statement childEmf = (Statement)mapEmf.get(ctx.getChild(i));
-            emf.getStatement().add(childEmf);
+            ParseTree childNode = ctx.getChild(i);
+            if(childNode instanceof StmtContext){
+                Statement childEmf0 = (Statement)mapEmf.get(ctx.getChild(i));
+                childEmf0.setTestString("stmt"+ i);
+                emf.getStatement().add(childEmf0);
+            }
         }
-    } */
+        //System.out.println(emf.getStatement().size());
+    }
 
-/*     @Override public void enterIf_stmt(STParser.If_stmtContext ctx) { }
+    @Override public void enterIf_stmt(STParser.If_stmtContext ctx) { }
 
     @Override public void exitIf_stmt(STParser.If_stmtContext ctx) { 
         IfStatement emf = stmtFactory.createIfStatement();
+        emf.setTestString("if_stmt_emf");
         mapEmf.put(ctx, emf);
         for(int i = 0; i < ctx.getChildCount(); i++){
             ParseTree childNode = ctx.getChild(i);
@@ -305,7 +319,37 @@ public class MyListener extends STBaseListener{
                 default: ;
             }
         }
-    } */
+    }
+
+    @Override public void enterElsif_stmt(STParser.Elsif_stmtContext ctx) { }
+
+	@Override public void exitElsif_stmt(STParser.Elsif_stmtContext ctx) { 
+        IfStatement emf = stmtFactory.createIfStatement();
+        emf.setTestString("if_stmt_emf");
+        mapEmf.put(ctx, emf);
+        for(int i = 0; i < ctx.getChildCount(); i++){
+            ParseTree childNode = ctx.getChild(i);
+            String childNodeStr = mapNodeStr.get(ctx.getChild(i));
+            switch(childNodeStr){
+                case "expression":
+                    Expression emf0 = (Expression)mapEmf.get(childNode);
+                    emf.setCondition(emf0);
+                    break;
+                case "stmt_list":
+                    StatementBody emf1 = (StatementBody)mapEmf.get(childNode);
+                    emf.setThenStatement(emf1);
+                    break;
+                default: ;
+            }
+        }
+    }
+
+	@Override public void enterElse_stmt(STParser.Else_stmtContext ctx) { }
+
+	@Override public void exitElse_stmt(STParser.Else_stmtContext ctx) { 
+        StatementBody emf = (StatementBody)mapEmf.get(ctx.getChild(1));
+        mapEmf.put(ctx, emf);
+    }
 
     @Override public void enterAssign_stmt(STParser.Assign_stmtContext ctx) { }
 
@@ -314,6 +358,7 @@ public class MyListener extends STBaseListener{
         switch(childNodeStr){
             case "variable": 
                 AssignmentStatement emf0 = stmtFactory.createAssignmentStatement();
+                emf0.setTestString("assign_stmt_emf");
                 mapEmf.put(ctx, emf0);
                 for(int i = 0; i < ctx.getChildCount(); i++){
                     EObject childEmf = mapEmf.get(ctx.getChild(i));
