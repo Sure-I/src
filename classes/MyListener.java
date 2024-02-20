@@ -245,6 +245,11 @@ public class MyListener extends STBaseListener{
     @Override public void exitStmt(STParser.StmtContext ctx) { 
         Statement emf = (Statement)mapEmf.get(ctx.getChild(0));
         mapEmf.put(ctx, emf);
+        if(emf instanceof AssignmentStatement){
+            AssignmentStatement emf0 = (AssignmentStatement)emf;
+            //String varName = emf0.getVariable().getName();
+            //System.out.println(varName);
+        }
     }
 
 /*     @Override public void enterSelection_stmt(STParser.Selection_stmtContext ctx) { }
@@ -302,22 +307,21 @@ public class MyListener extends STBaseListener{
         }
     } */
 
-/*     @Override public void enterAssign_stmt(STParser.Assign_stmtContext ctx) { }
+    @Override public void enterAssign_stmt(STParser.Assign_stmtContext ctx) { }
 
 	@Override public void exitAssign_stmt(STParser.Assign_stmtContext ctx) { 
         String childNodeStr = mapNodeStr.get(ctx.getChild(0));
         switch(childNodeStr){
-            case "variale": 
+            case "variable": 
                 AssignmentStatement emf0 = stmtFactory.createAssignmentStatement();
                 mapEmf.put(ctx, emf0);
                 for(int i = 0; i < ctx.getChildCount(); i++){
-                    ParseTree childNode = ctx.getChild(i);
                     EObject childEmf = mapEmf.get(ctx.getChild(i));
-                    if(childNode instanceof Variable){
+                    if(childEmf instanceof Variable){
                         Variable childEmf0 = (Variable)childEmf;
                         emf0.setVariable(childEmf0);
                     }
-                    else if(childNode instanceof Expression){
+                    else if(childEmf instanceof Expression){
                         Expression childEmf1 = (Expression)childEmf;
                         emf0.setExpression(childEmf1);
                     }
@@ -331,7 +335,7 @@ public class MyListener extends STBaseListener{
 
                 break;
         }
-    } */
+    }
 
 /* ////////////////////////////////////////////////////////////////////////
 //////以下是关于constant的部分
@@ -741,7 +745,8 @@ public class MyListener extends STBaseListener{
                 mapVarEmf.put(name, emf);
                 break;
             case "var_access":
-
+                Variable emf0 = (Variable)mapVarEmf.get(ctx.getText());
+                mapEmf.put(ctx, emf0);
                 break;
             case "loc_var_decl":
                 
@@ -753,7 +758,7 @@ public class MyListener extends STBaseListener{
         }
     }
 
-/*     @Override public void enterVariable(STParser.VariableContext ctx) { }
+    @Override public void enterVariable(STParser.VariableContext ctx) { }
 
 	@Override public void exitVariable(STParser.VariableContext ctx) { 
         ParseTree childNode = ctx.getChild(0);
@@ -805,7 +810,7 @@ public class MyListener extends STBaseListener{
                 break;
             default: System.out.println("Input Error!");
         }
-    } */
+    }
 
 
 /* ////////////////////////////////////////////////////////
@@ -840,8 +845,8 @@ public class MyListener extends STBaseListener{
             if(childNode instanceof Variable_nameContext){
                 Variable varEmf = (Variable)mapEmf.get(childNode);
                 varEmf.setType(typeEmf);
-                System.out.println(varEmf.getName());
-                System.out.println(varEmf.getType().getName());
+                //System.out.println(varEmf.getName());
+                //System.out.println(varEmf.getType().getName());
             }
         }
     }
