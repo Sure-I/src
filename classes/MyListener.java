@@ -1,3 +1,15 @@
+/* ///针对Listener进行方法重载，用于实例化AST相对应的EMF语言模型
+//////目前已完成如下部分
+//////expression
+//////基本数据类型
+//////数字类常量
+//////字符类常量
+//////基础数据类型的变量声明及初始化
+//////stmt_list
+//////assign_stmt
+//////if_stmt
+////////////////////////////////////////////////////////////////////////////////////////////// */
+
 package classes;
 
 
@@ -57,7 +69,7 @@ public class MyListener extends STBaseListener{
     StatementsFactory stmtFactory = StatementsFactory.eINSTANCE;
 
 
-/* ///实例化过程使用两个HashMap
+/* ///实例化过程使用多个HashMap
 //////mapEmf用来存储ctx对应的实例化的对象，mapRuleName用来存储ctx的对应的字符串
 //////mapRuleName的作用是，帮助ctx访问子节点的规则类型，方便ctx进行switch...case...语句 */
     public Map<ParseTree, EObject> mapEmf = new HashMap<>();
@@ -69,6 +81,9 @@ public class MyListener extends STBaseListener{
 //////用一个HashMap来记录所有使用到的类型emf，包括自定义的类型和基本数据类型
     public Map<String, EObject> mapTypeEmf = new HashMap<>();
 
+//////用一个HashMap来记录function
+
+//////用一个HashMap来记录method
 
 //////setFromChildEmf()方法，获取某个子节点的emf并关联
     private void setFromChildEmf(ParserRuleContext ctx, int i){
@@ -250,48 +265,26 @@ public class MyListener extends STBaseListener{
             mapEmf.put(ctx, emf);
 
         }
-/*         else{
-            报错；
-        } */
+        else{ }
     }
 
 /* /////////////////////////////////////////////////////////////////////////
 //////以下是关于statement的部分
 //////
 ////// */
+    @Override public void enterStatements(STParser.StatementsContext ctx) { }
+
+    @Override public void exitStatements(STParser.StatementsContext ctx) { 
+        setFromChildEmf(ctx, 0);
+    }
 
     @Override public void enterStmt(STParser.StmtContext ctx) { }
 
     @Override public void exitStmt(STParser.StmtContext ctx) { 
         setFromChildEmf(ctx, 0);
-        EObject emf = getEmf(ctx);
-
-        if(emf instanceof AssignmentStatement){
-/*             AssignmentStatement emf0 = (AssignmentStatement)emf;
-            String testString0 = emf0.getTestString();
-            System.out.println(testString0); */
-        }
-        else if(emf instanceof IfStatement){
-            IfStatement emf1 = (IfStatement)emf;
-            String testString1 = emf1.getTestString();
-            String condition = emf1.getCondition().getTestString();
-            System.out.println(testString1);
-            System.out.println("condition:" + condition);
-        }
+        //Statement emf = (Statement)getEmf(ctx);
+        //System.out.println(emf.getTestString());
     }
-
-    @Override public void enterSelection_stmt(STParser.Selection_stmtContext ctx) { }
-
-	@Override public void exitSelection_stmt(STParser.Selection_stmtContext ctx) { 
-        setFromChildEmf(ctx, 0);
-    }
-
-/*     @Override public void enterIteration_stmt(STParser.Iteration_stmtContext ctx) { }
-
-	@Override public void exitIteration_stmt(STParser.Iteration_stmtContext ctx) { 
-        Statement emf = (Statement)mapEmf.get(ctx.getChild(0));
-        mapEmf.put(ctx, emf);
-    } */
 
     @Override public void enterStmt_list(STParser.Stmt_listContext ctx) { }
 
@@ -307,6 +300,18 @@ public class MyListener extends STBaseListener{
             }
         }
         //System.out.println(emf.getStatement().size());
+    }
+
+    @Override public void enterSelection_stmt(STParser.Selection_stmtContext ctx) { }
+
+	@Override public void exitSelection_stmt(STParser.Selection_stmtContext ctx) { 
+        setFromChildEmf(ctx, 0);
+    }
+
+    @Override public void enterIteration_stmt(STParser.Iteration_stmtContext ctx) { }
+
+	@Override public void exitIteration_stmt(STParser.Iteration_stmtContext ctx) { 
+        setFromChildEmf(ctx, 0);
     }
 
     @Override public void enterIf_stmt(STParser.If_stmtContext ctx) { }
@@ -392,16 +397,82 @@ public class MyListener extends STBaseListener{
         }
     }
 
+    @Override public void enterFor_stmt(STParser.For_stmtContext ctx) { 
+        ForStatement emf = stmtFactory.createForStatement();
+        mapEmf.put(ctx, emf);
+        emf.setTestString("for_stmt_emf");
+    }
+
+	@Override public void exitFor_stmt(STParser.For_stmtContext ctx) { 
+        ForStatement emf = (ForStatement)getEmf(ctx);
+        for(int i = 0; i < ctx.getChildCount(); i++){
+            ParseTree childNode = ctx.getChild(i);
+            String childNodeStr = mapNodeStr.get(childNode);
+            switch(childNodeStr){
+                case "control_variable":
+                    emf.setControlVariable(childNode.getText());
+                    break;
+                case "stmt_list":
+                    emf.setStatementBody((StatementBody)mapEmf.get(childNode));
+                    break;
+                default: ;
+            }
+        }
+
+        //String endExpr = ((LiteralExpression)emf.getEndExpression()).getLiteral().getValue();
+        //System.out.println(endExpr);
+    }
+
+	@Override public void enterControl_variable(STParser.Control_variableContext ctx) { }
+
+	@Override public void exitControl_variable(STParser.Control_variableContext ctx) { }
+
+	@Override public void enterFor_list(STParser.For_listContext ctx) { }
+
+	@Override public void exitFor_list(STParser.For_listContext ctx) { 
+        ForStatement emf = (ForStatement)mapEmf.get(ctx.getParent());
+        for(int i = 0; i < ctx.getChildCount(); i++){
+            ParseTree childNode = ctx.getChild(i);
+            String childNodeStr = mapNodeStr.get(childNode);
+            switch(childNodeStr){
+                case "start_expr":
+                    emf.setStartExpression((Expression)getChildEmf(ctx, i));
+                    break;
+                case "end_expr":
+                    emf.setEndExpression((Expression)getChildEmf(ctx, i));
+                    break;
+                case "step_expr":
+                    emf.setStepExpression((Expression)getChildEmf(ctx, i));
+                    break;
+                default: ;
+            }
+        }
+    }
+
+    @Override public void enterStart_expr(STParser.Start_exprContext ctx) { }
+
+	@Override public void exitStart_expr(STParser.Start_exprContext ctx) { 
+        setFromChildEmf(ctx, 0);
+    }
+
+	@Override public void enterEnd_expr(STParser.End_exprContext ctx) { }
+
+	@Override public void exitEnd_expr(STParser.End_exprContext ctx) { 
+        setFromChildEmf(ctx, 0);
+    }
+
+	@Override public void enterStep_expr(STParser.Step_exprContext ctx) { 
+        setFromChildEmf(ctx, 0);
+    }
+
 /* ////////////////////////////////////////////////////////////////////////
 //////以下是关于constant的部分
 //////ST.g4文件中的constant规则，对应语言模型ECore的Literal
 ////// */
-    @Override public void enterConstant(STParser.ConstantContext ctx) { 
-
-    }
+    @Override public void enterConstant(STParser.ConstantContext ctx) { }
 
     @Override public void exitConstant(STParser.ConstantContext ctx) { 
-        
+        setFromChildEmf(ctx, 0);
     }
 
     @Override public void enterNumeric_literal(STParser.Numeric_literalContext ctx) { 
@@ -772,7 +843,7 @@ public class MyListener extends STBaseListener{
     }
 
 	@Override public void exitVariable_list(STParser.Variable_listContext ctx) { 
-        VariableList emf = (VariableList)mapEmf.get(ctx);
+        VariableList emf = (VariableList)getEmf(ctx);
         for(int i = 0; i < ctx.getChildCount(); i++){
             ParseTree childNode = ctx.getChild(i);
             if(childNode instanceof Variable_nameContext){
@@ -875,7 +946,6 @@ public class MyListener extends STBaseListener{
 ////// */
     @Override public void enterDecl_common_part(STParser.Decl_common_partContext ctx) { }
 
-
     ////decl_common_part的实例化对象为Initializer，实例化步骤在子节点中进行完成，本节点中进行关联
     ////在exit中完成容器declaration以及属性variableList的设定，并且完成VariableList对象和Variable对象的属性设置
     @Override public void exitDecl_common_part(STParser.Decl_common_partContext ctx) {
@@ -936,7 +1006,7 @@ public class MyListener extends STBaseListener{
         emf.setType(typeEmf);
 
         if(ctx.getChildCount() == 3){
-            Expression exprEmf = (Expression)mapEmf.get(ctx.getChild(2));
+            Expression exprEmf = (Expression)getChildEmf(ctx, 2);
             emf.setValue(exprEmf);
         }
     }

@@ -1,6 +1,6 @@
 package interfaces;
 
-import 	classes.*;
+import classes.*;
 // Generated from .//ST.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -139,6 +139,16 @@ public interface STListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitDerived_func_name(STParser.Derived_func_nameContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link STParser#func_call}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunc_call(STParser.Func_callContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link STParser#func_call}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunc_call(STParser.Func_callContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link STParser#func_access}.
 	 * @param ctx the parse tree
@@ -309,26 +319,6 @@ public interface STListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitStatements(STParser.StatementsContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link STParser#variable_access}.
-	 * @param ctx the parse tree
-	 */
-	void enterVariable_access(STParser.Variable_accessContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#variable_access}.
-	 * @param ctx the parse tree
-	 */
-	void exitVariable_access(STParser.Variable_accessContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link STParser#func_call}.
-	 * @param ctx the parse tree
-	 */
-	void enterFunc_call(STParser.Func_callContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#func_call}.
-	 * @param ctx the parse tree
-	 */
-	void exitFunc_call(STParser.Func_callContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link STParser#stmt_list}.
 	 * @param ctx the parse tree
@@ -520,6 +510,36 @@ public interface STListener extends ParseTreeListener {
 	 */
 	void exitFor_list(STParser.For_listContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link STParser#start_expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterStart_expr(STParser.Start_exprContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link STParser#start_expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitStart_expr(STParser.Start_exprContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link STParser#end_expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterEnd_expr(STParser.End_exprContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link STParser#end_expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitEnd_expr(STParser.End_exprContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link STParser#step_expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterStep_expr(STParser.Step_exprContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link STParser#step_expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitStep_expr(STParser.Step_exprContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link STParser#while_stmt}.
 	 * @param ctx the parse tree
 	 */
@@ -539,6 +559,26 @@ public interface STListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitRepeat_stmt(STParser.Repeat_stmtContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link STParser#exit_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void enterExit_stmt(STParser.Exit_stmtContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link STParser#exit_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void exitExit_stmt(STParser.Exit_stmtContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link STParser#continue_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void enterContinue_stmt(STParser.Continue_stmtContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link STParser#continue_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void exitContinue_stmt(STParser.Continue_stmtContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link STParser#data_type_access}.
 	 * @param ctx the parse tree
