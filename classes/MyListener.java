@@ -26,6 +26,8 @@ import java.io.PipedOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.swing.plaf.nimbus.State;
+
 import org.antlr.v4.codegen.model.decl.Decl;
 import org.antlr.v4.parse.ANTLRParser.delegateGrammar_return;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -523,21 +525,70 @@ public class MyListener extends STBaseListener{
         mapEmf.put(ctx, emf);
     }
 
-    @Override public void enterCase_stmt(STParser.Case_stmtContext ctx) { }
+    @Override public void enterCase_stmt(STParser.Case_stmtContext ctx) { 
+        CaseStatement emf = stmtFactory.createCaseStatement();
+        mapEmf.put(ctx, emf);
+        emf.setTestString("case_stmt_emf");
+    }
 
-	@Override public void exitCase_stmt(STParser.Case_stmtContext ctx) { }
+	@Override public void exitCase_stmt(STParser.Case_stmtContext ctx) { 
+        CaseStatement emf = (CaseStatement)getEmf(ctx);
+        for(int i = 0; i < ctx.getChildCount(); i++){
+            String childNodeStr = mapNodeStr.get(ctx.getChild(i));
+            if(childNodeStr == "expression"){
+                emf.setSelector((Expression)getChildEmf(ctx, i));
+            }
+            else if(childNodeStr == "case_selection"){ 
+                emf.getGroupStatement().add((GroupStatement)getChildEmf(ctx, i));
+            }
+            else if(childNodeStr == "stmt_list"){
+                emf.setElseStatement((StatementBody)getChildEmf(ctx, i));
+            }
+            else{ }
+        }
+    }
 
-	@Override public void enterCase_selection(STParser.Case_selectionContext ctx) { }
+    //case_slection对应ECore中的GroupStatement类
+	@Override public void enterCase_selection(STParser.Case_selectionContext ctx) { 
+        GroupStatement emf = stmtFactory.createGroupStatement();
+        mapEmf.put(ctx, emf);
+    }
 
-	@Override public void exitCase_selection(STParser.Case_selectionContext ctx) { }
+	@Override public void exitCase_selection(STParser.Case_selectionContext ctx) { 
+        GroupStatement emf = (GroupStatement)getEmf(ctx);
+        for(int i = 0; i < ctx.getChildCount(); i++){
+            String childNodeStr = mapNodeStr.get(ctx.getChild(i));
+            if(childNodeStr == "stmt_list"){
+                emf.setStatementBody((StatementBody)getChildEmf(ctx, i));
+            }
+            else{ }
+        }
+
+        //String exprLabel = ((LiteralExpression)emf.getExprLabel().get(0)).getLiteral().getValue();
+        //System.out.println(exprLabel);
+    }
 
 	@Override public void enterCase_list(STParser.Case_listContext ctx) { }
 
-	@Override public void exitCase_list(STParser.Case_listContext ctx) { }
+	@Override public void exitCase_list(STParser.Case_listContext ctx) { 
+        GroupStatement emf = (GroupStatement)mapEmf.get(ctx.getParent());
+        for(int i = 0; i < ctx.getChildCount(); i++){
+            EObject childEmf = getChildEmf(ctx, i);
+            if(childEmf instanceof Expression){
+                emf.getExprLabel().add((Expression)childEmf);
+            }
+            else if(childEmf instanceof SubrangeType){
+                emf.getSubrangeLabel().add((SubrangeType)childEmf);
+            }
+            else{ }
+        }
+    }
 
 	@Override public void enterCase_list_elem(STParser.Case_list_elemContext ctx) { }
 
-	@Override public void exitCase_list_elem(STParser.Case_list_elemContext ctx) { }
+	@Override public void exitCase_list_elem(STParser.Case_list_elemContext ctx) { 
+        setFromChildEmf(ctx, 0);
+    }
 
 /* ////////////////////////////////////////////////////////////////////////
 //////以下是关于constant的部分
