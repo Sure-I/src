@@ -8,8 +8,16 @@
 //////stmt_list
 //////assign_stmt
 //////if_stmt
+//////for_stmt
+//////while_stmt, repeat_stmt, 这两项未经测试
 ////////////////////////////////////////////////////////////////////////////////////////////// */
 
+/* ///整体思路如下
+//////针对生成语法树的每一个节点进行遍历，节点会有enter()和exit()一对方法
+//////根据情况不同，在enter或exit时创建对应的emf模型(大多数情况为exit时)
+//////考虑到AST中的一些节点和其子节点存在reference关系，需要在父节点或子节点中设定
+//////这里使用规则名ruleName来进行筛选并执行操作
+///////////////////////////////////////////////////////////////////////////////////////////// */
 package classes;
 
 
@@ -423,10 +431,6 @@ public class MyListener extends STBaseListener{
         //System.out.println(endExpr);
     }
 
-	@Override public void enterControl_variable(STParser.Control_variableContext ctx) { }
-
-	@Override public void exitControl_variable(STParser.Control_variableContext ctx) { }
-
 	@Override public void enterFor_list(STParser.For_listContext ctx) { }
 
 	@Override public void exitFor_list(STParser.For_listContext ctx) { 
@@ -465,6 +469,76 @@ public class MyListener extends STBaseListener{
         setFromChildEmf(ctx, 0);
     }
 
+    @Override public void enterWhile_stmt(STParser.While_stmtContext ctx) { }
+
+	@Override public void exitWhile_stmt(STParser.While_stmtContext ctx) { 
+        WhileStatement emf = stmtFactory.createWhileStatement();
+        mapEmf.put(ctx, emf);
+        for(int i = 0; i < ctx.getChildCount(); i++){
+            ParseTree childNode = ctx.getChild(i);
+            String childNodeStr = mapNodeStr.get(childNode);
+            switch(childNodeStr){
+                case "expression":
+                    emf.setCondition((Expression)getChildEmf(ctx, i));
+                    break;
+                case "stmt_list":
+                    emf.setStatementBody((StatementBody)getChildEmf(ctx, i));
+                    break;
+                default: ;
+            }
+        }
+    }
+
+	@Override public void enterRepeat_stmt(STParser.Repeat_stmtContext ctx) { }
+
+	@Override public void exitRepeat_stmt(STParser.Repeat_stmtContext ctx) { 
+        RepeatStatement emf = stmtFactory.createRepeatStatement();
+        mapEmf.put(ctx, emf);
+        for(int i = 0; i < ctx.getChildCount(); i++){
+            ParseTree childNode = ctx.getChild(i);
+            String childNodeStr = mapNodeStr.get(childNode);
+            switch(childNodeStr){
+                case "stmt_list":
+                    emf.setStatementBody((StatementBody)getChildEmf(ctx, i));
+                    break;
+                case "expression":
+                    emf.setCondition((Expression)getChildEmf(ctx, i));
+                    break;
+                default: ;
+            }
+        }
+    }
+
+    @Override public void enterExit_stmt(STParser.Exit_stmtContext ctx) { }
+
+	@Override public void exitExit_stmt(STParser.Exit_stmtContext ctx) { 
+        ExitStatement emf = stmtFactory.createExitStatement();
+        mapEmf.put(ctx, emf);
+    }
+
+	@Override public void enterContinue_stmt(STParser.Continue_stmtContext ctx) { }
+
+	@Override public void exitContinue_stmt(STParser.Continue_stmtContext ctx) { 
+        ContinueStatement emf = stmtFactory.createContinueStatement();
+        mapEmf.put(ctx, emf);
+    }
+
+    @Override public void enterCase_stmt(STParser.Case_stmtContext ctx) { }
+
+	@Override public void exitCase_stmt(STParser.Case_stmtContext ctx) { }
+
+	@Override public void enterCase_selection(STParser.Case_selectionContext ctx) { }
+
+	@Override public void exitCase_selection(STParser.Case_selectionContext ctx) { }
+
+	@Override public void enterCase_list(STParser.Case_listContext ctx) { }
+
+	@Override public void exitCase_list(STParser.Case_listContext ctx) { }
+
+	@Override public void enterCase_list_elem(STParser.Case_list_elemContext ctx) { }
+
+	@Override public void exitCase_list_elem(STParser.Case_list_elemContext ctx) { }
+
 /* ////////////////////////////////////////////////////////////////////////
 //////以下是关于constant的部分
 //////ST.g4文件中的constant规则，对应语言模型ECore的Literal
@@ -475,9 +549,7 @@ public class MyListener extends STBaseListener{
         setFromChildEmf(ctx, 0);
     }
 
-    @Override public void enterNumeric_literal(STParser.Numeric_literalContext ctx) { 
-
-    }
+    @Override public void enterNumeric_literal(STParser.Numeric_literalContext ctx) { }
 
     @Override public void exitNumeric_literal(STParser.Numeric_literalContext ctx) { 
         NumericLiteral emf = liteFactory.createNumericLiteral();
@@ -689,12 +761,12 @@ public class MyListener extends STBaseListener{
             if(mapTypeEmf.get(typeName) == null){
                 switch (typeName) {
                     case "STRING":
-                        ElementaryDataType emf = typeFactory.createElementaryDataType();
-                        mapEmf.put(ctx, emf);
-                        mapEmf.put(childNode, emf);
-                        mapTypeEmf.put(typeName, emf);
-                        emf.setName(typeName);
-                        emf.setType(PreDefinedEDType.STRING);
+                        ElementaryDataType emf0 = typeFactory.createElementaryDataType();
+                        mapEmf.put(ctx, emf0);
+                        mapEmf.put(childNode, emf0);
+                        mapTypeEmf.put(typeName, emf0);
+                        emf0.setName(typeName);
+                        emf0.setType(PreDefinedEDType.STRING);
                         break;
                     case "WSTRING":
                         ElementaryDataType emf1 = typeFactory.createElementaryDataType();
@@ -730,9 +802,6 @@ public class MyListener extends STBaseListener{
 
 	@Override public void exitType_access(STParser.Type_accessContext ctx) { }
 
-    @Override public void enterType_name(STParser.Type_nameContext ctx) { }
-
-	@Override public void exitType_name(STParser.Type_nameContext ctx) { }
 
 
 /* ////////////////////////////////////////////////////////
