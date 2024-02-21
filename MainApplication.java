@@ -19,7 +19,7 @@ public class MainApplication {
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             STParser parser = new STParser(tokens);
             ParseTree tree = parser.program();
-            System.out.println(tree.toStringTree(parser));
+            //System.out.println(tree.toStringTree(parser));
 
         /////////////////////////////////////////////////
 
