@@ -1181,7 +1181,7 @@ public class MyListener extends STBaseListener{
         emf.setDeclaration(parentEmf);
         parentEmf.getInitializer().add(emf);
 
-        //同步设定variable_list的类型
+        //同步设定variable_list的类型，以及容器关系
         STParser.Variable_listContext variableListNode = (STParser.Variable_listContext)ctx.getChild(0);
         VariableList variableListEmf = (VariableList)mapEmf.get(variableListNode);
         variableListEmf.setInitializer(emf);
