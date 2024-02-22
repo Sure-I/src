@@ -1166,6 +1166,7 @@ public class MyListener extends STBaseListener{
     ////decl_common_part的实例化对象为Initializer，实例化步骤在子节点中进行完成，本节点中进行关联
     ////在exit中完成容器declaration以及属性variableList的设定，并且完成VariableList对象和Variable对象的属性设置
     @Override public void exitDecl_common_part(STParser.Decl_common_partContext ctx) {
+        setFromChildEmf(ctx, 2);
         VariableInitializer emf = (VariableInitializer)mapEmf.get(ctx); 
         Type typeEmf = emf.getType();
         //String testString = emf.getTestString();
@@ -1197,34 +1198,22 @@ public class MyListener extends STBaseListener{
         SimpleInit emf = initFactory.createSimpleInit();
         mapEmf.put(ctx, emf);
         emf.setTestString("simple_spec_init_emf");
-
-        ParserRuleContext parentNode = ctx.getParent();
-        String parentNodeStr = mapNodeStr.get(parentNode);
-        switch(parentNodeStr){
-            case "decl_common_part":
-                mapEmf.put(parentNode, emf);
-                break;
-            case "simple_type_decl":
-
-                break;
-            case "struct_elem_decl":
-
-                break;
-            case "loc_var_spec_init":
-
-                break;
-        }
     }
 
     @Override public void exitSimple_spec_init(STParser.Simple_spec_initContext ctx) { 
         SimpleInit emf = (SimpleInit)getEmf(ctx);
-        STParser.Elem_type_nameContext typeNode = (STParser.Elem_type_nameContext)ctx.getChild(0);
-        Type typeEmf = (Type)mapEmf.get(typeNode);
-        emf.setType(typeEmf);
 
-        if(ctx.getChildCount() == 3){
-            Expression exprEmf = (Expression)getChildEmf(ctx, 2);
-            emf.setValue(exprEmf);
+        for(int i = 0; i < ctx.getChildCount(); i++){
+            String childNodestr = mapNodeStr.get(ctx.getChild(i));
+            if(childNodestr == "elem_type_name"){
+                Type typeEmf = (Type)mapTypeEmf.get(ctx.getChild(i).getText());
+                emf.setType(typeEmf);
+            }
+            else if(childNodestr == "expression"){
+                Expression exprEmf = (Expression)getChildEmf(ctx, i);
+                emf.setValue(exprEmf);
+            }
+            else{ }
         }
     }
 

@@ -904,37 +904,37 @@ public class STBaseListener implements STListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterNamed_spec_init(STParser.Named_spec_initContext ctx) { }
+	@Override public void enterEnum_spec(STParser.Enum_specContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitNamed_spec_init(STParser.Named_spec_initContext ctx) { }
+	@Override public void exitEnum_spec(STParser.Enum_specContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterEnum_spec_init(STParser.Enum_spec_initContext ctx) { }
+	@Override public void enterNamed_spec(STParser.Named_specContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitEnum_spec_init(STParser.Enum_spec_initContext ctx) { }
+	@Override public void exitNamed_spec(STParser.Named_specContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterEnum_value_spec(STParser.Enum_value_specContext ctx) { }
+	@Override public void enterQuote_value(STParser.Quote_valueContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitEnum_value_spec(STParser.Enum_value_specContext ctx) { }
+	@Override public void exitQuote_value(STParser.Quote_valueContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -947,6 +947,18 @@ public class STBaseListener implements STListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitEnum_value(STParser.Enum_valueContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterEnum_spec_init(STParser.Enum_spec_initContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitEnum_spec_init(STParser.Enum_spec_initContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

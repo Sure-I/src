@@ -747,35 +747,35 @@ public interface STListener extends ParseTreeListener {
 	 */
 	void exitEnum_type_decl(STParser.Enum_type_declContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link STParser#named_spec_init}.
+	 * Enter a parse tree produced by {@link STParser#enum_spec}.
 	 * @param ctx the parse tree
 	 */
-	void enterNamed_spec_init(STParser.Named_spec_initContext ctx);
+	void enterEnum_spec(STParser.Enum_specContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link STParser#named_spec_init}.
+	 * Exit a parse tree produced by {@link STParser#enum_spec}.
 	 * @param ctx the parse tree
 	 */
-	void exitNamed_spec_init(STParser.Named_spec_initContext ctx);
+	void exitEnum_spec(STParser.Enum_specContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link STParser#enum_spec_init}.
+	 * Enter a parse tree produced by {@link STParser#named_spec}.
 	 * @param ctx the parse tree
 	 */
-	void enterEnum_spec_init(STParser.Enum_spec_initContext ctx);
+	void enterNamed_spec(STParser.Named_specContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link STParser#enum_spec_init}.
+	 * Exit a parse tree produced by {@link STParser#named_spec}.
 	 * @param ctx the parse tree
 	 */
-	void exitEnum_spec_init(STParser.Enum_spec_initContext ctx);
+	void exitNamed_spec(STParser.Named_specContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link STParser#enum_value_spec}.
+	 * Enter a parse tree produced by {@link STParser#quote_value}.
 	 * @param ctx the parse tree
 	 */
-	void enterEnum_value_spec(STParser.Enum_value_specContext ctx);
+	void enterQuote_value(STParser.Quote_valueContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link STParser#enum_value_spec}.
+	 * Exit a parse tree produced by {@link STParser#quote_value}.
 	 * @param ctx the parse tree
 	 */
-	void exitEnum_value_spec(STParser.Enum_value_specContext ctx);
+	void exitQuote_value(STParser.Quote_valueContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link STParser#enum_value}.
 	 * @param ctx the parse tree
@@ -786,6 +786,16 @@ public interface STListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitEnum_value(STParser.Enum_valueContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link STParser#enum_spec_init}.
+	 * @param ctx the parse tree
+	 */
+	void enterEnum_spec_init(STParser.Enum_spec_initContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link STParser#enum_spec_init}.
+	 * @param ctx the parse tree
+	 */
+	void exitEnum_spec_init(STParser.Enum_spec_initContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link STParser#array_type_decl}.
 	 * @param ctx the parse tree
