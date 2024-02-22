@@ -760,7 +760,9 @@ public class MyListener extends STBaseListener{
                 emf0.setLowerBound((Expression)mapEmf.get(ctx.getChild(1).getChild(1)));
                 emf0.setUpperBound((Expression)mapEmf.get(ctx.getChild(1).getChild(3)));
             }
-            else{ }
+            else{ 
+                emf0.setTypeAccess((Type)mapEmf.get(ctx.getChild(0)));
+            }
         }
         else if(emf instanceof Initializer){ }
         else{ }
@@ -934,7 +936,15 @@ public class MyListener extends STBaseListener{
 
     @Override public void enterType_access(STParser.Type_accessContext ctx) { }
 
-	@Override public void exitType_access(STParser.Type_accessContext ctx) { }
+	@Override public void exitType_access(STParser.Type_accessContext ctx) { 
+        for(int i = 0; i < ctx.getChildCount(); i++){
+            String childNodeStr = mapNodeStr.get(ctx.getChild(i));
+            if(childNodeStr == "type_name"){
+                Type emf = (Type)mapTypeEmf.get(ctx.getChild(i).getText());
+                mapEmf.put(ctx, emf);
+            }
+        }
+    }
 
     @Override public void enterString_type_access(STParser.String_type_accessContext ctx) { }
 
