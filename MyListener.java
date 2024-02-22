@@ -92,6 +92,11 @@ public class MyListener extends STBaseListener{
         EObject emf = mapEmf.get(ctx.getChild(i));
         mapEmf.put(ctx, emf);
     }
+//////setFromParentEmf()方法，获取某个子节点的emf并关联
+    private void setFromParentEmf(ParseTree ctx){
+        EObject emf = mapEmf.get(ctx.getParent());
+        mapEmf.put(ctx, emf);
+    }
 //////getEmf()方法，获取节点自身的emf并返回该对象
     private EObject getEmf(ParserRuleContext ctx){
         EObject emf = mapEmf.get(ctx);
@@ -250,22 +255,24 @@ public class MyListener extends STBaseListener{
         else if( mapNodeStr.get(ctx.getChild(0)) == "constant" ){
             LiteralExpression emf = exprFactory.createLiteralExpression();
             mapEmf.put(ctx, emf);
-
+            emf.setTestString("constant_expr_emf");
             emf.setLiteral( (Literal)getChildEmf(ctx, 0) );
         }
 /*         else if( mapNodeStr.get(ctx.getChild(0)) == "enum_value" ){
             LiteralExpression emf = exprFactory.create();
             mapEmf.put(ctx, emf);
         } */
-        else if( mapNodeStr.get(ctx.getChild(0)) == "variable_access" ){
+        else if( mapNodeStr.get(ctx.getChild(0)) == "var_access" ){
             VariableExpression emf = exprFactory.createVariableExpression();
             mapEmf.put(ctx, emf);
 
+            emf.setTestString("var_access_expr_emf");
         }
         else if( mapNodeStr.get(ctx.getChild(0)) == "func_call" ){
             FunctionCall emf = exprFactory.createFunctionCall();
             mapEmf.put(ctx, emf);
 
+            emf.setTestString("fun_call_expr_emf");
         }
         else{ }
     }
@@ -673,14 +680,90 @@ public class MyListener extends STBaseListener{
 //////
 //////
 ////// */
+    @Override public void enterType_name(STParser.Type_nameContext ctx) { }
+
+    @Override public void exitType_name(STParser.Type_nameContext ctx) { 
+        String typeName = ctx.getText();
+        if(mapTypeEmf.get(typeName) == null){
+            String parentNodeStr = mapNodeStr.get(ctx.getParent());
+            switch(parentNodeStr){
+                case "simple_type_decl":
+    
+                    break;
+                case "subrange_type_decl":
+                    SubrangeType emf2 = typeFactory.createSubrangeType();
+                    mapEmf.put(ctx, emf2);
+                    emf2.setName(typeName);
+                    mapTypeEmf.put(typeName, emf2);
+                    break;
+            }
+        }
+        else{
+            Type emf0 = (Type)mapTypeEmf.get(typeName);
+            mapEmf.put(ctx, emf0);
+        }
+    }
+
     @Override public void enterData_type_decl(STParser.Data_type_declContext ctx) { }
 
-    @Override public void exitData_type_decl(STParser.Data_type_declContext ctx) { }
+    @Override public void exitData_type_decl(STParser.Data_type_declContext ctx) { 
+        setFromChildEmf(ctx, 1);
+        //System.out.println(((TypeDeclList)mapEmf.get(ctx)).getTypeDeclatation().get(0).getType().getName());
+    }
+
+    @Override public void enterType_decl_list(STParser.Type_decl_listContext ctx) { }
+
+	@Override public void exitType_decl_list(STParser.Type_decl_listContext ctx) { 
+        TypeDeclList emf = declFactory.createTypeDeclList();
+        mapEmf.put(ctx, emf);
+        for(int i = 0; i < ctx.getChildCount(); i++){
+            String childNodeStr = mapNodeStr.get(ctx.getChild(i));
+            if(childNodeStr == "type_decl"){
+                emf.getTypeDeclatation().add((TypeDeclaration)getChildEmf(ctx, i));
+            }
+        }
+    }
 
     @Override public void enterType_decl(STParser.Type_declContext ctx) { }
 
     @Override public void exitType_decl(STParser.Type_declContext ctx) { 
         setFromChildEmf(ctx, 0);
+    }
+
+    @Override public void enterSubrange_type_decl(STParser.Subrange_type_declContext ctx) { 
+        SubrangeTypeDecl emf = declFactory.createSubrangeTypeDecl();
+        mapEmf.put(ctx, emf);
+    }
+
+	@Override public void exitSubrange_type_decl(STParser.Subrange_type_declContext ctx) { 
+        SubrangeTypeDecl emf = (SubrangeTypeDecl)getEmf(ctx);
+        for(int i = 0; i < ctx.getChildCount(); i++){
+            String childNodeStr = mapNodeStr.get(ctx.getChild(i));
+            if(childNodeStr == "type_name"){
+                emf.setType((SubrangeType)getChildEmf(ctx, i));
+            }
+        }
+
+        //System.out.println(emf.getType().getName());
+        //System.out.println(emf.getUpperBound().getTestString());
+    }
+
+	@Override public void enterSubrange_spec(STParser.Subrange_specContext ctx) { }
+
+	@Override public void exitSubrange_spec(STParser.Subrange_specContext ctx) { 
+        setFromParentEmf(ctx);
+        EObject emf = getEmf(ctx);
+        if(emf instanceof Declaration){
+            SubrangeTypeDecl emf0 = (SubrangeTypeDecl)emf;
+            if(ctx.getChildCount() == 2){
+                emf0.setBaseType((ElementaryDataType)mapEmf.get(ctx.getChild(0)));
+                emf0.setLowerBound((Expression)mapEmf.get(ctx.getChild(1).getChild(1)));
+                emf0.setUpperBound((Expression)mapEmf.get(ctx.getChild(1).getChild(3)));
+            }
+            else{ }
+        }
+        else if(emf instanceof Initializer){ }
+        else{ }
     }
 
     @Override public void enterElem_type_name(STParser.Elem_type_nameContext ctx) { }
@@ -689,13 +772,13 @@ public class MyListener extends STBaseListener{
         ParseTree childNode = ctx.getChild(0);
         if(childNode instanceof TerminalNode){
             String typeName = ctx.getText();
+            //System.out.println(typeName);
             if(mapTypeEmf.get(typeName) == null){
                 ElementaryDataType emf = typeFactory.createElementaryDataType();
                 mapEmf.put(ctx, emf);
                 mapTypeEmf.put(typeName, emf);
                 switch(typeName){
                     case "BOOL":
-                        //System.out.println(typeName);
                         emf.setName(typeName);
                         emf.setType(PreDefinedEDType.BOOL);
                         break;
@@ -1150,4 +1233,8 @@ public class MyListener extends STBaseListener{
     }
 
 	@Override public void exitStruct_spec_init(STParser.Struct_spec_initContext ctx) { }
+
+    @Override public void enterSubrange_spec_init(STParser.Subrange_spec_initContext ctx) { }
+
+	@Override public void exitSubrange_spec_init(STParser.Subrange_spec_initContext ctx) { }
 }
