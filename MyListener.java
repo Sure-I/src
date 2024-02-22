@@ -10,6 +10,9 @@
 //////if_stmt
 //////for_stmt
 //////while_stmt, repeat_stmt, 这两项未经测试
+//////完成所有statement
+//////subrange_type
+//////enum_type
 ////////////////////////////////////////////////////////////////////////////////////////////// */
 
 /* ///整体思路如下
@@ -1172,17 +1175,20 @@ public class MyListener extends STBaseListener{
         //String testString = emf.getTestString();
         //System.out.println(testString);
 
+        //initializer属于variableDeclaration，而且一个variableDeclaration中可能含有多个initializer，在此设定容器关系
         ParserRuleContext parentNode = ctx.getParent();
         VariableDeclaration parentEmf = (VariableDeclaration)mapEmf.get(parentNode);
         emf.setDeclaration(parentEmf);
         parentEmf.getInitializer().add(emf);
 
+        //同步设定variable_list的类型
         STParser.Variable_listContext variableListNode = (STParser.Variable_listContext)ctx.getChild(0);
         VariableList variableListEmf = (VariableList)mapEmf.get(variableListNode);
         variableListEmf.setInitializer(emf);
         variableListEmf.setType(typeEmf);
         emf.setVariableList(variableListEmf);
 
+        //同步设定variable的类型
         for(int i = 0; i < variableListNode.getChildCount(); i++){
             ParseTree childNode = variableListNode.getChild(i);
             if(childNode instanceof STParser.Variable_nameContext){
