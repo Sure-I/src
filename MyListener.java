@@ -796,8 +796,8 @@ public class MyListener extends STBaseListener{
                 }
                 else{ 
                     emf0.setBaseType((ElementaryDataType)getChildEmf(ctx, 0));
-                    emf0.setLowerBound((Expression)mapEmf.get(ctx.getChild(1).getChild(1)));
-                    emf0.setUpperBound((Expression)mapEmf.get(ctx.getChild(1).getChild(3)));
+                    emf0.setLowerBound((Expression)mapEmf.get(ctx.getChild(2).getChild(0)));
+                    emf0.setUpperBound((Expression)mapEmf.get(ctx.getChild(2).getChild(2)));
                 }
             }
             else if(parentEmf instanceof Initializer){ 
@@ -808,8 +808,8 @@ public class MyListener extends STBaseListener{
                 }
                 else{ 
                     emf1.setBaseType((ElementaryDataType)getChildEmf(ctx, 0));
-                    emf1.setLowerBound((Expression)mapEmf.get(ctx.getChild(1).getChild(1)));
-                    emf1.setUpperBound((Expression)mapEmf.get(ctx.getChild(1).getChild(3)));
+                    emf1.setLowerBound((Expression)mapEmf.get(ctx.getChild(2).getChild(0)));
+                    emf1.setUpperBound((Expression)mapEmf.get(ctx.getChild(2).getChild(2)));
                 }
             }
             else{ }
@@ -861,6 +861,7 @@ public class MyListener extends STBaseListener{
                             //System.out.println(((Literal)getChildEmf(ctx, i)).getValue());
                             emf0.getEnumValue().add((Literal)getChildEmf(ctx, i));
                         }
+                        else if(childNodeStr == "named_spec"){ }
                     }
                 }
             }
@@ -922,6 +923,18 @@ public class MyListener extends STBaseListener{
             System.err.println("Error In Enum_value!!!");
         }
     }
+
+    @Override public void enterArray_type_decl(STParser.Array_type_declContext ctx) { }
+
+	@Override public void exitArray_type_decl(STParser.Array_type_declContext ctx) { }
+
+	@Override public void enterArray_spec(STParser.Array_specContext ctx) { }
+
+	@Override public void exitArray_spec(STParser.Array_specContext ctx) { }
+
+    @Override public void enterArray_elem_init_value(STParser.Array_elem_init_valueContext ctx) { }
+
+	@Override public void exitArray_elem_init_value(STParser.Array_elem_init_valueContext ctx) { }
 
     @Override public void enterElem_type_name(STParser.Elem_type_nameContext ctx) { }
 
@@ -1455,4 +1468,16 @@ public class MyListener extends STBaseListener{
             System.err.println("Error In Enum_spec_init!!!");
         }
     }
+
+    @Override public void enterArray_spec_init(STParser.Array_spec_initContext ctx) { }
+
+	@Override public void exitArray_spec_init(STParser.Array_spec_initContext ctx) { }
+
+	@Override public void enterArray_init(STParser.Array_initContext ctx) { }
+
+	@Override public void exitArray_init(STParser.Array_initContext ctx) { }
+
+	@Override public void enterArray_elem_init(STParser.Array_elem_initContext ctx) { }
+
+	@Override public void exitArray_elem_init(STParser.Array_elem_initContext ctx) { }
 }

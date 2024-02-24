@@ -807,16 +807,6 @@ public interface STListener extends ParseTreeListener {
 	 */
 	void exitArray_type_decl(STParser.Array_type_declContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link STParser#array_spec_init}.
-	 * @param ctx the parse tree
-	 */
-	void enterArray_spec_init(STParser.Array_spec_initContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#array_spec_init}.
-	 * @param ctx the parse tree
-	 */
-	void exitArray_spec_init(STParser.Array_spec_initContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link STParser#array_spec}.
 	 * @param ctx the parse tree
 	 */
@@ -826,6 +816,16 @@ public interface STListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitArray_spec(STParser.Array_specContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link STParser#array_spec_init}.
+	 * @param ctx the parse tree
+	 */
+	void enterArray_spec_init(STParser.Array_spec_initContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link STParser#array_spec_init}.
+	 * @param ctx the parse tree
+	 */
+	void exitArray_spec_init(STParser.Array_spec_initContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link STParser#array_init}.
 	 * @param ctx the parse tree
