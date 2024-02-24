@@ -26,6 +26,7 @@
 
 import java.io.IOException;
 import java.io.PipedOutputStream;
+import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -712,6 +713,12 @@ public class MyListener extends STBaseListener{
                         emfEnumType.setName(typeName);
                         mapTypeEmf.put(typeName, emfEnumType);
                         break;
+                    case "array_type_decl":
+                        ArrayType emfArrayType = typeFactory.createArrayType();
+                        mapEmf.put(ctx, emfArrayType);
+                        emfArrayType.setName(typeName);
+                        mapTypeEmf.put(typeName, emfArrayType);
+                        break;
                 }
             }
             else{
@@ -775,6 +782,7 @@ public class MyListener extends STBaseListener{
 
             if(emf.getTypeAccess() == null){
                 //System.out.println(emf.getType().getName() + ": new subrange_type_decl");
+                //System.out.println(((LiteralExpression)emf.getSubrange().getLowerBound()).getLiteral().getValue());
             }
             else{
                 //System.out.println(emf.getType().getName() + ": type_access->" + emf.getTypeAccess().getName());
@@ -790,14 +798,14 @@ public class MyListener extends STBaseListener{
         try{
             EObject parentEmf = getParentEmf(ctx);
             if(parentEmf instanceof Declaration){
+                setFromParentEmf(ctx);
                 SubrangeTypeDecl emf0 = (SubrangeTypeDecl)parentEmf;
                 if(mapNodeStr.get(ctx.getChild(0)) == "type_access"){
                     emf0.setTypeAccess((Type)getChildEmf(ctx, 0));
                 }
                 else{ 
                     emf0.setBaseType((ElementaryDataType)getChildEmf(ctx, 0));
-                    emf0.setLowerBound((Expression)mapEmf.get(ctx.getChild(2).getChild(0)));
-                    emf0.setUpperBound((Expression)mapEmf.get(ctx.getChild(2).getChild(2)));
+                    emf0.setSubrange((Subrange)getChildEmf(ctx, 2));
                 }
             }
             else if(parentEmf instanceof Initializer){ 
@@ -808,13 +816,25 @@ public class MyListener extends STBaseListener{
                 }
                 else{ 
                     emf1.setBaseType((ElementaryDataType)getChildEmf(ctx, 0));
-                    emf1.setLowerBound((Expression)mapEmf.get(ctx.getChild(2).getChild(0)));
-                    emf1.setUpperBound((Expression)mapEmf.get(ctx.getChild(2).getChild(2)));
+                    emf1.setSubrange((Subrange)getChildEmf(ctx, 2));
                 }
             }
             else{ }
         } catch(Exception exception){
             System.err.println("Error In Subrange_spec!!!");
+        }
+    }
+
+    @Override public void enterSubrange(STParser.SubrangeContext ctx) { }
+
+	@Override public void exitSubrange(STParser.SubrangeContext ctx) { 
+        Subrange emf = declFactory.createSubrange();
+        mapEmf.put(ctx, emf);
+        try{
+            emf.setLowerBound((Expression)getChildEmf(ctx, 0));
+            emf.setUpperBound((Expression)getChildEmf(ctx, 2));
+        } catch(Exception exception){
+            System.err.println("Error In Subrange!!!");
         }
     }
 
@@ -850,6 +870,7 @@ public class MyListener extends STBaseListener{
         try{
             EObject parentEmf = getParentEmf(ctx);
             if(parentEmf instanceof Declaration){
+                setFromParentEmf(ctx);
                 EnumTypeDecl emf0 = (EnumTypeDecl)parentEmf;
                 if(mapNodeStr.get(ctx.getChild(0)) == "type_access"){
                     emf0.setTypeAccess((Type)getChildEmf(ctx, 0));
@@ -924,13 +945,59 @@ public class MyListener extends STBaseListener{
         }
     }
 
-    @Override public void enterArray_type_decl(STParser.Array_type_declContext ctx) { }
+    @Override public void enterArray_type_decl(STParser.Array_type_declContext ctx) { 
+        ArrayTypeDecl emf = declFactory.createArrayTypeDecl();
+        mapEmf.put(ctx, emf);
+    }
 
-	@Override public void exitArray_type_decl(STParser.Array_type_declContext ctx) { }
+	@Override public void exitArray_type_decl(STParser.Array_type_declContext ctx) { 
+        try{ 
+            ArrayTypeDecl emf = (ArrayTypeDecl)getEmf(ctx);
+            for(int i = 0; i < ctx.getChildCount(); i++){
+                String childNodeStr = mapNodeStr.get(ctx.getChild(i));
+                if(childNodeStr == "type_name"){
+                    emf.setType((ArrayType)getChildEmf(ctx, i));
+                }
+            }
+
+            if(emf.getTypeAccess() == null){
+                //System.out.println(emf.getType().getName() + ": new subrange_type_decl");
+                //System.out.println(((LiteralExpression)emf.getSubrange().getLowerBound()).getLiteral().getValue());
+            }
+            else{
+                //System.out.println(emf.getType().getName() + ": type_access->" + emf.getTypeAccess().getName());
+            }
+        } catch(Exception exception){
+            System.err.println("Error In Array_type_decl!!!");
+        }
+    }
 
 	@Override public void enterArray_spec(STParser.Array_specContext ctx) { }
 
-	@Override public void exitArray_spec(STParser.Array_specContext ctx) { }
+	@Override public void exitArray_spec(STParser.Array_specContext ctx) { 
+        try{
+            EObject parentEmf = getParentEmf(ctx);
+            if(parentEmf instanceof Declaration){
+                setFromParentEmf(ctx);
+                ArrayTypeDecl emf0 = (ArrayTypeDecl)parentEmf;
+                if(mapNodeStr.get(ctx.getChild(0)) == "type_access"){
+                    emf0.setTypeAccess((Type)getChildEmf(ctx, 0));
+                }
+                else{ }
+            }
+            else if(parentEmf instanceof Initializer){ 
+                ArrayTypeDecl emf1 = declFactory.createArrayTypeDecl();
+                mapEmf.put(ctx, emf1);
+                if(mapNodeStr.get(ctx.getChild(0)) == "type_access"){
+                    emf1.setTypeAccess((Type)getChildEmf(ctx, 0));
+                }
+                else{ }
+            }
+            else{ }
+        } catch(Exception exception){
+            System.err.println("Error In Array_spec!!!");
+        }
+    }
 
     @Override public void enterArray_elem_init_value(STParser.Array_elem_init_valueContext ctx) { }
 
