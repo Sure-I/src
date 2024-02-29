@@ -121,6 +121,122 @@ public class MyListener extends STBaseListener{
         return emf;
     }
 
+//////compareType()，用来对比输入参数的类型是否匹配，确认是否能进行运算
+    private Boolean compareType(Type type, Expression expr){
+        Boolean result;
+        if(expr instanceof LiteralExpression){
+            if(expr.getType().getName() == "INTEGER"){
+                switch(type.getName()){
+                    case "SINT": result = true; break;
+                    case "INT": result = true; break;
+                    case "DINT": result = true; break;
+                    case "LINT": result = true; break;
+                    case "USINT": result = true; break;
+                    case "UINT": result = true; break;
+                    case "UDINT": result = true; break;
+                    case "ULINT": result = true; break;
+                    default: result = false; break;
+                }
+            }
+            else if(expr.getType().getName() == "SINGLE_BYTE_CHAR"){
+                switch(type.getName()){
+                    case "STRING": result = true; break;
+                    case "WSTRING": result = true; break;
+                    case "CHAR": result = true; break;
+                    case "WCHAR": result = true; break;
+                    default: result = false; break;
+                }
+            }
+            else{ result = false; }
+        }
+        else{ 
+            if(type.getName() == expr.getType().getName()){
+                result = true;
+            }
+            else{
+                result = false;
+            }
+        }
+        return result;
+    }
+
+    private Boolean compareType(Expression expr1, Expression expr2){
+        Boolean result;
+        if(expr2 instanceof LiteralExpression){
+            if(expr2.getType().getName() == "INTEGER"){
+                switch(expr1.getType().getName()){
+                    case "SINT": result = true; break;
+                    case "INT": result = true; break;
+                    case "DINT": result = true; break;
+                    case "LINT": result = true; break;
+                    case "USINT": result = true; break;
+                    case "UINT": result = true; break;
+                    case "UDINT": result = true; break;
+                    case "ULINT": result = true; break;
+                    default: result = false; break;
+                }
+            }
+            else if(expr2.getType().getName() == "SINGLE_BYTE_CHAR"){
+                switch(expr1.getType().getName()){
+                    case "STRING": result = true; break;
+                    case "WSTRING": result = true; break;
+                    case "CHAR": result = true; break;
+                    case "WCHAR": result = true; break;
+                    default: result = false; break;
+                }
+            }
+            else{ result = false; }
+        }
+        else{ 
+            if(expr1.getType().getName() == expr2.getType().getName()){
+                result = true;
+            }
+            else{
+                result = false;
+            }
+        }
+        return result;
+    }
+
+    private Boolean compareType(Variable var, Expression expr){
+        Boolean result;
+        if(expr instanceof LiteralExpression){
+            if(expr.getType().getName() == "INTEGER"){
+                switch(var.getType().getName()){
+                    case "SINT": result = true; break;
+                    case "INT": result = true; break;
+                    case "DINT": result = true; break;
+                    case "LINT": result = true; break;
+                    case "USINT": result = true; break;
+                    case "UINT": result = true; break;
+                    case "UDINT": result = true; break;
+                    case "ULINT": result = true; break;
+                    default: result = false; break;
+                }
+            }
+            else if(expr.getType().getName() == "SINGLE_BYTE_CHAR"){
+                switch(var.getType().getName()){
+                    case "STRING": result = true; break;
+                    case "WSTRING": result = true; break;
+                    case "CHAR": result = true; break;
+                    case "WCHAR": result = true; break;
+                    default: result = false; break;
+                }
+            }
+            else{ result = false; }
+        }
+        else{ 
+            if(var.getType().getName() == expr.getType().getName()){
+                result = true;
+            }
+            else{
+                result = false;
+            }
+        }
+        return result;
+    }
+
+
 /* ///获取ruleNode的规则名 */
     @Override public void enterEveryRule(ParserRuleContext ctx) { 
         String ruleName = STParser.ruleNames[ctx.getRuleIndex()];
@@ -211,14 +327,10 @@ public class MyListener extends STBaseListener{
             emf.setSecondExpression( (Expression)getChildEmf(ctx, 2) );
             emf.setType(emf.getFirstExpression().getType());
 
-            if(emf.getSecondExpression() instanceof LiteralExpression){
-                
-            }
+            if(compareType(emf.getFirstExpression(), emf.getSecondExpression())){ }
             else{
-                if(emf.getFirstExpression().getType() != emf.getSecondExpression().getType()){
-                    System.err.println("Type is not compatible in: " + ctx.getText());
-                    System.exit(0);
-                }
+                System.err.println("Type is not compatible in: " + ctx.getText());
+                System.exit(0);
             }
 
             String nodeStr = mapNodeStr.get(ctx.getChild(1));
@@ -280,6 +392,32 @@ public class MyListener extends STBaseListener{
             mapEmf.put(ctx, emf);
             emf.setTestString("constant_expr_emf");
             emf.setLiteral( (Literal)getChildEmf(ctx, 0) );
+
+            if(emf.getLiteral().getType() == LiteralType.INTEGER){
+                if(mapTypeEmf.get("INTEGER") == null){
+                    TypeDeclaration typeDeclEmf = declFactory.createTypeDeclaration();
+                    UserDefinedDataType typeEmf = typeFactory.createUserDefinedDataType();
+                    typeDeclEmf.setType(typeEmf);
+                    typeEmf.setTypeDeclaration(typeDeclEmf);
+                    typeEmf.setName("INTEGER");
+                    mapTypeEmf.put("INTEGER", typeEmf);
+                    emf.setType(typeEmf);
+                }
+                else{emf.setType((Type)mapTypeEmf.get("INTEGER"));}
+            }
+            else if(emf.getLiteral().getType() == LiteralType.SINGLE_BYTE_CHAR){
+                if(mapTypeEmf.get("SINGLE_BYTE_CHAR") == null){
+                    TypeDeclaration typeDeclEmf = declFactory.createTypeDeclaration();
+                    UserDefinedDataType typeEmf = typeFactory.createUserDefinedDataType();
+                    typeDeclEmf.setType(typeEmf);
+                    typeEmf.setTypeDeclaration(typeDeclEmf);
+                    typeEmf.setName("SINGLE_BYTE_CHAR");
+                    mapTypeEmf.put("SINGLE_BYTE_CHAR", typeEmf);
+                    emf.setType(typeEmf);
+                }
+                else{emf.setType((Type)mapTypeEmf.get("SINGLE_BYTE_CHAR"));}
+            }
+            else{}
         }
         else if( mapNodeStr.get(ctx.getChild(0)) == "enum_value" ){
             LiteralExpression emf = exprFactory.createLiteralExpression();
@@ -422,9 +560,13 @@ public class MyListener extends STBaseListener{
                     }
                     else{ }
                 }
-                if(emf0.getVariable().getType() != emf0.getExpression().getType()){
-                    //System.err.println("Type is not compatible in: " + ctx.getText());
-                    //System.exit(0);
+                if(emf0.getExpression() == null){ }
+                else{
+                    if(compareType(emf0.getVariable(), emf0.getExpression())){ }
+                    else{
+                        System.err.println("Type is not compatible in: " + ctx.getText());
+                        System.exit(0);
+                    }
                 }
                 break;
             case "ref_assign": 
@@ -630,37 +772,15 @@ public class MyListener extends STBaseListener{
     @Override public void enterNumeric_literal(STParser.Numeric_literalContext ctx) { }
 
     @Override public void exitNumeric_literal(STParser.Numeric_literalContext ctx) { 
-        NumericLiteral emf = liteFactory.createNumericLiteral();
-        mapEmf.put(ctx, emf);
-        String childNodeStr = mapNodeStr.get(ctx.getChild(0));
-        switch(childNodeStr){
-            case "int_literal": 
-                emf.setType(LiteralType.INTEGER);
-                break;
-            case "real_interal": 
-                emf.setType(LiteralType.REAL);
-                break;
-            case "real_interal_exponent": 
-                emf.setType(LiteralType.REAL_EXPONENT);
-                break;
-            case "bool_literal": 
-                emf.setType(LiteralType.BOOLEAN);
-                break;
-            case "typed_literal": 
-                emf.setType(LiteralType.TYPED);
-                break;
-        }
-        String value = ((Literal)getChildEmf(ctx, 0)).getValue();
-        emf.setValue(value);
-        //System.out.println(value);
-
+        setFromChildEmf(ctx, 0);
     }
 
     @Override public void enterInt_literal(STParser.Int_literalContext ctx) { }
 
 	@Override public void exitInt_literal(STParser.Int_literalContext ctx) { 
-        Literal emf = elemFactory.createLiteral();
+        NumericLiteral emf = liteFactory.createNumericLiteral();
         mapEmf.put(ctx, emf);
+        emf.setType(LiteralType.INTEGER);
         String value = ctx.getText();
         //System.out.println(value);
         emf.setValue(value);
@@ -671,6 +791,7 @@ public class MyListener extends STBaseListener{
 	@Override public void exitReal_literal(STParser.Real_literalContext ctx) { 
         Literal emf = elemFactory.createLiteral();
         mapEmf.put(ctx, emf);
+        emf.setType(LiteralType.REAL);
         String value = ctx.getText();
         emf.setValue(value);
     }
@@ -689,6 +810,7 @@ public class MyListener extends STBaseListener{
 	@Override public void exitBool_literal(STParser.Bool_literalContext ctx) { 
         Literal emf = elemFactory.createLiteral();
         mapEmf.put(ctx, emf);
+        emf.setType(LiteralType.BOOLEAN);
         String value = ctx.getText();
         emf.setValue(value);
     }
@@ -698,10 +820,20 @@ public class MyListener extends STBaseListener{
 	@Override public void exitTyped_literal(STParser.Typed_literalContext ctx) { 
         Literal emf = elemFactory.createLiteral();
         mapEmf.put(ctx, emf);
+        emf.setType(LiteralType.TYPED);
         String value = ctx.getText();
         emf.setValue(value);
     }
 
+    @Override public void enterChar_literal(STParser.Char_literalContext ctx) { }
+
+	@Override public void exitChar_literal(STParser.Char_literalContext ctx) { 
+        CharLiteral emf = liteFactory.createCharLiteral();
+        mapEmf.put(ctx, emf);
+        emf.setType(LiteralType.SINGLE_BYTE_CHAR);
+        String value = ctx.getText();
+        emf.setValue(value);
+    }
 
 /* ////////////////////////////////////////////////////////
 //////以下是关于type的部分
@@ -1590,6 +1722,16 @@ public class MyListener extends STBaseListener{
                 }
                 else{ }
             }
+
+/*             if(emf.getValue() == null){ }
+            else{
+                if(compareType(emf.getType(), emf.getValue())){ }
+                else{
+                    System.err.println("Type is not compatible in: " + ctx.getText());
+                    System.exit(0);
+                }
+            } */
+
         } catch(Exception exception){
             System.err.println("Error In Simple_spec_init!!!");
         }
