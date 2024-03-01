@@ -65,7 +65,7 @@ import st.statements.*;
 
 
 
-public class MyListener extends STBaseListener{
+public class GenModelListener extends STBaseListener{
 
 /* ///引入EMF模型的factory方法，用于给节点创建语言模型实例 */
     ElementsFactory elemFactory = ElementsFactory.eINSTANCE;
@@ -121,121 +121,6 @@ public class MyListener extends STBaseListener{
         return emf;
     }
 
-//////compareType()，用来对比输入参数的类型是否匹配，确认是否能进行运算
-    private Boolean compareType(Type type, Expression expr){
-        Boolean result;
-        if(expr instanceof LiteralExpression){
-            if(expr.getType().getName() == "INTEGER"){
-                switch(type.getName()){
-                    case "SINT": result = true; break;
-                    case "INT": result = true; break;
-                    case "DINT": result = true; break;
-                    case "LINT": result = true; break;
-                    case "USINT": result = true; break;
-                    case "UINT": result = true; break;
-                    case "UDINT": result = true; break;
-                    case "ULINT": result = true; break;
-                    default: result = false; break;
-                }
-            }
-            else if(expr.getType().getName() == "SINGLE_BYTE_CHAR"){
-                switch(type.getName()){
-                    case "STRING": result = true; break;
-                    case "WSTRING": result = true; break;
-                    case "CHAR": result = true; break;
-                    case "WCHAR": result = true; break;
-                    default: result = false; break;
-                }
-            }
-            else{ result = false; }
-        }
-        else{ 
-            if(type.getName() == expr.getType().getName()){
-                result = true;
-            }
-            else{
-                result = false;
-            }
-        }
-        return result;
-    }
-
-    private Boolean compareType(Expression expr1, Expression expr2){
-        Boolean result;
-        if(expr2 instanceof LiteralExpression){
-            if(expr2.getType().getName() == "INTEGER"){
-                switch(expr1.getType().getName()){
-                    case "SINT": result = true; break;
-                    case "INT": result = true; break;
-                    case "DINT": result = true; break;
-                    case "LINT": result = true; break;
-                    case "USINT": result = true; break;
-                    case "UINT": result = true; break;
-                    case "UDINT": result = true; break;
-                    case "ULINT": result = true; break;
-                    default: result = false; break;
-                }
-            }
-            else if(expr2.getType().getName() == "SINGLE_BYTE_CHAR"){
-                switch(expr1.getType().getName()){
-                    case "STRING": result = true; break;
-                    case "WSTRING": result = true; break;
-                    case "CHAR": result = true; break;
-                    case "WCHAR": result = true; break;
-                    default: result = false; break;
-                }
-            }
-            else{ result = false; }
-        }
-        else{ 
-            if(expr1.getType().getName() == expr2.getType().getName()){
-                result = true;
-            }
-            else{
-                result = false;
-            }
-        }
-        return result;
-    }
-
-    private Boolean compareType(Variable var, Expression expr){
-        Boolean result;
-        if(expr instanceof LiteralExpression){
-            if(expr.getType().getName() == "INTEGER"){
-                switch(var.getType().getName()){
-                    case "SINT": result = true; break;
-                    case "INT": result = true; break;
-                    case "DINT": result = true; break;
-                    case "LINT": result = true; break;
-                    case "USINT": result = true; break;
-                    case "UINT": result = true; break;
-                    case "UDINT": result = true; break;
-                    case "ULINT": result = true; break;
-                    default: result = false; break;
-                }
-            }
-            else if(expr.getType().getName() == "SINGLE_BYTE_CHAR"){
-                switch(var.getType().getName()){
-                    case "STRING": result = true; break;
-                    case "WSTRING": result = true; break;
-                    case "CHAR": result = true; break;
-                    case "WCHAR": result = true; break;
-                    default: result = false; break;
-                }
-            }
-            else{ result = false; }
-        }
-        else{ 
-            if(var.getType().getName() == expr.getType().getName()){
-                result = true;
-            }
-            else{
-                result = false;
-            }
-        }
-        return result;
-    }
-
 
 /* ///获取ruleNode的规则名 */
     @Override public void enterEveryRule(ParserRuleContext ctx) { 
@@ -280,9 +165,7 @@ public class MyListener extends STBaseListener{
 //////exit节点时对子节点进行判断，确定是哪一种expression
 //////实例化emf并且配置属性中的reference和attribute */
 
-	@Override public void enterExpression(STParser.ExpressionContext ctx) { 
-
-    }
+	@Override public void enterExpression(STParser.ExpressionContext ctx) { }
 
 	@Override public void exitExpression(STParser.ExpressionContext ctx) { 
         ParseTree childNode = ctx.getChild(0);
@@ -326,12 +209,6 @@ public class MyListener extends STBaseListener{
             emf.setFirstExpression( (Expression)getChildEmf(ctx, 0) );
             emf.setSecondExpression( (Expression)getChildEmf(ctx, 2) );
             emf.setType(emf.getFirstExpression().getType());
-
-            if(compareType(emf.getFirstExpression(), emf.getSecondExpression())){ }
-            else{
-                System.err.println("Type is not compatible in: " + ctx.getText());
-                System.exit(0);
-            }
 
             String nodeStr = mapNodeStr.get(ctx.getChild(1));
             switch(nodeStr){
@@ -559,14 +436,6 @@ public class MyListener extends STBaseListener{
                         emf0.setExpression(childEmf1);
                     }
                     else{ }
-                }
-                if(emf0.getExpression() == null){ }
-                else{
-                    if(compareType(emf0.getVariable(), emf0.getExpression())){ }
-                    else{
-                        System.err.println("Type is not compatible in: " + ctx.getText());
-                        System.exit(0);
-                    }
                 }
                 break;
             case "ref_assign": 
@@ -1722,15 +1591,6 @@ public class MyListener extends STBaseListener{
                 }
                 else{ }
             }
-
-/*             if(emf.getValue() == null){ }
-            else{
-                if(compareType(emf.getType(), emf.getValue())){ }
-                else{
-                    System.err.println("Type is not compatible in: " + ctx.getText());
-                    System.exit(0);
-                }
-            } */
 
         } catch(Exception exception){
             System.err.println("Error In Simple_spec_init!!!");
