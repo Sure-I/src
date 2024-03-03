@@ -1739,4 +1739,14 @@ public class GenModelListener extends STBaseListener{
             System.err.println("Array_init!!!");
         }
     }
+
+/* ////////////////////////////////////////////////////////
+//////以下是关于POU的部分
+//////
+//////
+////// */
+    @Override public void enterMethod_decl(STParser.Method_declContext ctx) { }
+
+	@Override public void exitMethod_decl(STParser.Method_declContext ctx) { }
+
 }
