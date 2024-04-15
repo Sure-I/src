@@ -27,34 +27,12 @@ import st.expressions.*;
 import st.statements.*;
 
 public class ModelCheckListener extends STBaseListener{
-    ParseTree tree;
-    GenModelListener genModelListener = new GenModelListener();
-    ParseTreeWalker genModelWalker = new ParseTreeWalker();
-
-    //之后从genModelListener中提出的HaspMap存放在下列属性中
+    //从genModelListener中提出的HaspMap存放在下列属性中
     public Map<ParseTree, EObject> mapEmf = new HashMap<>();
     public Map<ParseTree, String> mapNodeStr = new HashMap<>();
     public Map<String, EObject> mapVarEmf = new HashMap<>();
     public Map<String, EObject> mapTypeEmf = new HashMap<>();
 
-    public ModelCheckListener(String filepath){
-        try{
-            CharStream stream = CharStreams.fromFileName(filepath);
-            STLexer lexer = new STLexer(stream);
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
-            STParser parser = new STParser(tokens);
-            tree = parser.program();
-
-            genModelWalker.walk(genModelListener, tree);
-
-            mapEmf = genModelListener.mapEmf;
-            mapNodeStr = genModelListener.mapNodeStr;
-            mapVarEmf = genModelListener.mapVarEmf;
-            mapTypeEmf = genModelListener.mapTypeEmf;
-        } catch (Exception exception) {
-            System.err.println("Error In ModelCheckListen: genModel Error!!!");
-        }
-    }
 
     //////getEmf()方法，获取节点自身的emf并返回该对象
     private EObject getEmf(ParserRuleContext ctx){
