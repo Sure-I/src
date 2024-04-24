@@ -867,26 +867,6 @@ public interface STListener extends ParseTreeListener {
 	 */
 	void exitStruct_spec(STParser.Struct_specContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link STParser#struct_spec_init}.
-	 * @param ctx the parse tree
-	 */
-	void enterStruct_spec_init(STParser.Struct_spec_initContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#struct_spec_init}.
-	 * @param ctx the parse tree
-	 */
-	void exitStruct_spec_init(STParser.Struct_spec_initContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link STParser#struct_decl}.
-	 * @param ctx the parse tree
-	 */
-	void enterStruct_decl(STParser.Struct_declContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#struct_decl}.
-	 * @param ctx the parse tree
-	 */
-	void exitStruct_decl(STParser.Struct_declContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link STParser#struct_elem_decl}.
 	 * @param ctx the parse tree
 	 */
@@ -897,15 +877,15 @@ public interface STListener extends ParseTreeListener {
 	 */
 	void exitStruct_elem_decl(STParser.Struct_elem_declContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link STParser#struct_elem_name}.
+	 * Enter a parse tree produced by {@link STParser#struct_spec_init}.
 	 * @param ctx the parse tree
 	 */
-	void enterStruct_elem_name(STParser.Struct_elem_nameContext ctx);
+	void enterStruct_spec_init(STParser.Struct_spec_initContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link STParser#struct_elem_name}.
+	 * Exit a parse tree produced by {@link STParser#struct_spec_init}.
 	 * @param ctx the parse tree
 	 */
-	void exitStruct_elem_name(STParser.Struct_elem_nameContext ctx);
+	void exitStruct_spec_init(STParser.Struct_spec_initContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link STParser#struct_init}.
 	 * @param ctx the parse tree
@@ -926,6 +906,16 @@ public interface STListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitStruct_elem_init(STParser.Struct_elem_initContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link STParser#struct_elem_name}.
+	 * @param ctx the parse tree
+	 */
+	void enterStruct_elem_name(STParser.Struct_elem_nameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link STParser#struct_elem_name}.
+	 * @param ctx the parse tree
+	 */
+	void exitStruct_elem_name(STParser.Struct_elem_nameContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link STParser#str_type_decl}.
 	 * @param ctx the parse tree
@@ -1327,26 +1317,6 @@ public interface STListener extends ParseTreeListener {
 	 */
 	void exitInt_literal(STParser.Int_literalContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link STParser#real_literal}.
-	 * @param ctx the parse tree
-	 */
-	void enterReal_literal(STParser.Real_literalContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#real_literal}.
-	 * @param ctx the parse tree
-	 */
-	void exitReal_literal(STParser.Real_literalContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link STParser#real_literal_exponent}.
-	 * @param ctx the parse tree
-	 */
-	void enterReal_literal_exponent(STParser.Real_literal_exponentContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#real_literal_exponent}.
-	 * @param ctx the parse tree
-	 */
-	void exitReal_literal_exponent(STParser.Real_literal_exponentContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link STParser#bool_literal}.
 	 * @param ctx the parse tree
 	 */
@@ -1357,15 +1327,15 @@ public interface STListener extends ParseTreeListener {
 	 */
 	void exitBool_literal(STParser.Bool_literalContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link STParser#typed_literal}.
+	 * Enter a parse tree produced by {@link STParser#bit_str_literal}.
 	 * @param ctx the parse tree
 	 */
-	void enterTyped_literal(STParser.Typed_literalContext ctx);
+	void enterBit_str_literal(STParser.Bit_str_literalContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link STParser#typed_literal}.
+	 * Exit a parse tree produced by {@link STParser#bit_str_literal}.
 	 * @param ctx the parse tree
 	 */
-	void exitTyped_literal(STParser.Typed_literalContext ctx);
+	void exitBit_str_literal(STParser.Bit_str_literalContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link STParser#char_literal}.
 	 * @param ctx the parse tree

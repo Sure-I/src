@@ -29,6 +29,7 @@ public class MainApplication {
             ParseTreeWalker myWalker = new ParseTreeWalker();
             //首次遍历AST进行EMF模型实例化
             GenModelListener genModelListener = new GenModelListener();
+
             myWalker.walk(genModelListener, tree);
             mapEmf = genModelListener.mapEmf;
             mapNodeStr = genModelListener.mapNodeStr;

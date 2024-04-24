@@ -3,6 +3,13 @@
 //////该类的构造器，先通过GenModelListener对输入文件的解析树实例化为EMF
 //////将GenModelListener中的各个EMF的HashMap提取出
 //////再通过walker进行一次遍历，该类中对于每个节点的enter()和eixt()方法对的重载为校验功能
+
+/////////////已编写规则条目如下，<>规则写在GenModelListener中，[]规则写在ModelCheckListener中
+//////*<使用未声明标识符，比如变量、自定义类型> */
+//////*<调用不存在的函数或功能块> */
+//////*[expression操作数类型不匹配] */
+//////*<enum类型变量赋值不在定义中> */
+//////* */
 ///////////////////////////////////////////////////////////////////////////////////////////////// */
 import java.util.HashMap;
 import java.util.Map;
@@ -66,6 +73,12 @@ public class ModelCheckListener extends STBaseListener{
                     default: result = false; break;
                 }
             }
+            else if(expr.getType().getName() == "REAL"){
+                switch(type.getName()){
+                    case "REAL": result = true; break;
+                    default: result = false; break;
+                }
+            }
             else{ result = false; }
         }
         else{ 
@@ -104,6 +117,12 @@ public class ModelCheckListener extends STBaseListener{
                     default: result = false; break;
                 }
             }
+            else if(expr2.getType().getName() == "REAL"){
+                switch(expr1.getType().getName()){
+                    case "REAL": result = true; break;
+                    default: result = false; break;
+                }
+            }
             else{ result = false; }
         }
         else{ 
@@ -120,29 +139,37 @@ public class ModelCheckListener extends STBaseListener{
     private Boolean compareType(Variable var, Expression expr){
         Boolean result;
         if(expr instanceof LiteralExpression){
-            if(expr.getType().getName() == "INTEGER"){
-                switch(var.getType().getName()){
-                    case "SINT": result = true; break;
-                    case "INT": result = true; break;
-                    case "DINT": result = true; break;
-                    case "LINT": result = true; break;
-                    case "USINT": result = true; break;
-                    case "UINT": result = true; break;
-                    case "UDINT": result = true; break;
-                    case "ULINT": result = true; break;
-                    default: result = false; break;
+            switch(expr.getType().getName()){
+                case"INTEGER":
+                    switch(var.getType().getName()){
+                        case "SINT": result = true; break;
+                        case "INT": result = true; break;
+                        case "DINT": result = true; break;
+                        case "LINT": result = true; break;
+                        case "USINT": result = true; break;
+                        case "UINT": result = true; break;
+                        case "UDINT": result = true; break;
+                        case "ULINT": result = true; break;
+                        default: result = false; break;
+                    }
+                break;
+                case"SINGLE_BYTE_CHAR":
+                    switch(var.getType().getName()){
+                        case "STRING": result = true; break;
+                        case "WSTRING": result = true; break;
+                        case "CHAR": result = true; break;
+                        case "WCHAR": result = true; break;
+                        default: result = false; break;
+                    }
+                break;
+                case"REAL":
+                    switch(var.getType().getName()){
+                        case "REAL": result = true; break;
+                        default: result = false; break;
+                    }
+                break;
+                default: result = false; break;
                 }
-            }
-            else if(expr.getType().getName() == "SINGLE_BYTE_CHAR"){
-                switch(var.getType().getName()){
-                    case "STRING": result = true; break;
-                    case "WSTRING": result = true; break;
-                    case "CHAR": result = true; break;
-                    case "WCHAR": result = true; break;
-                    default: result = false; break;
-                }
-            }
-            else{ result = false; }
         }
         else{ 
             if(var.getType().getName() == expr.getType().getName()){
@@ -161,7 +188,7 @@ public class ModelCheckListener extends STBaseListener{
             BinaryExpression emf = (BinaryExpression)exprEmf;
             if(compareType(emf.getFirstExpression(), emf.getSecondExpression())){ }
             else{
-                System.err.println("Type is not compatible in: " + ctx.getText());
+                System.err.println("[ Type is not compatible in: " + ctx.getText() + " ]");
                 System.exit(0);
             }
         }
@@ -173,7 +200,7 @@ public class ModelCheckListener extends STBaseListener{
         else{
             if(compareType(emf.getVariable(), emf.getExpression())){ }
             else{
-                System.err.println("Type is not compatible in: " + ctx.getText());
+                System.err.println("[ Type is not compatible in: " + ctx.getText() + " ]");
                 System.exit(0);
             }
         }
