@@ -719,24 +719,28 @@ public class GenModelListener extends STBaseListener{
                         break;
                     case "subrange_type_decl":
                         SubrangeType emfSubrangeType = typeFactory.createSubrangeType();
+                        emfSubrangeType.setTypeDeclaration(((TypeDeclaration)mapEmf.get(ctx.getParent())));
                         mapEmf.put(ctx, emfSubrangeType);
                         emfSubrangeType.setName(typeName);
                         mapTypeEmf.put(typeName, emfSubrangeType);
                         break;
                     case "enum_type_decl":
                         EnumType emfEnumType = typeFactory.createEnumType();
+                        emfEnumType.setTypeDeclaration(((TypeDeclaration)mapEmf.get(ctx.getParent())));
                         mapEmf.put(ctx, emfEnumType);
                         emfEnumType.setName(typeName);
                         mapTypeEmf.put(typeName, emfEnumType);
                         break;
                     case "array_type_decl":
                         ArrayType emfArrayType = typeFactory.createArrayType();
+                        emfArrayType.setTypeDeclaration(((TypeDeclaration)mapEmf.get(ctx.getParent())));
                         mapEmf.put(ctx, emfArrayType);
                         emfArrayType.setName(typeName);
                         mapTypeEmf.put(typeName, emfArrayType);
                         break;
                     case "struct_type_decl":
                         StructType emfStructType = typeFactory.createStructType();
+                        emfStructType.setTypeDeclaration(((TypeDeclaration)mapEmf.get(ctx.getParent())));
                         mapEmf.put(ctx, emfStructType);
                         emfStructType.setName(typeName);
                         mapTypeEmf.put(typeName, emfStructType);
@@ -1117,7 +1121,9 @@ public class GenModelListener extends STBaseListener{
         }
     }
 
-	@Override public void enterStruct_spec(STParser.Struct_specContext ctx) { 
+	@Override public void enterStruct_spec(STParser.Struct_specContext ctx) { }
+
+	@Override public void exitStruct_spec(STParser.Struct_specContext ctx) { 
         try{
             EObject parentEmf = getParentEmf(ctx);
             if(parentEmf instanceof Declaration){
@@ -1135,15 +1141,16 @@ public class GenModelListener extends STBaseListener{
                 }
             }
             else if(parentEmf instanceof Initializer){ 
-
+                StructTypeDecl emf0 = declFactory.createStructTypeDecl();
+                if(mapNodeStr.get(ctx.getChild(0)) == "type_access"){
+                    emf0.setTypeAccess((Type)getChildEmf(ctx, 0));
+                }
             }
             else{ }
         } catch(Exception exception){
             System.err.println("Error In Struct_spec!!!");
         }
     }
-
-	@Override public void exitStruct_spec(STParser.Struct_specContext ctx) { }
 
 	@Override public void enterStruct_elem_decl(STParser.Struct_elem_declContext ctx) { 
         StructElemDecl emf = declFactory.createStructElemDecl();
