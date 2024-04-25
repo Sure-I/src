@@ -745,6 +745,12 @@ public class GenModelListener extends STBaseListener{
                         emfStructType.setName(typeName);
                         mapTypeEmf.put(typeName, emfStructType);
                         break;
+                    default:
+                        if(mapTypeEmf.get(typeName) == null){
+                            System.err.println("Error: <type " + typeName + " is not declared!!!>");
+                            System.exit(0);
+                        }
+                        break;
                 }
             }
             else{

@@ -8,17 +8,6 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.eclipse.emf.ecore.EObject;
 
-import st.basics.*;
-import st.elements.*;
-import st.literals.*;
-import st.initializer.*;
-import st.types.*;
-import st.variables.*;
-import st.pous.*;
-import st.declarations.*;
-import st.expressions.*;
-import st.statements.*;
-
 public class MainApplication {
 	static ParseTree tree;
 
