@@ -26,6 +26,7 @@
 //////*[在函数调用中定义了一个局部变量] */
 //////*[局部变量在函数调用中作为输出处理] */
 //////*[传递给被调用函数的参数过多或过少] */
+//////*[传递给被调用函数的参数不匹配] */
 ///////////////////////////////////////////////////////////////////////////////////////////////// */
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +56,9 @@ public class ModelCheckListener extends STBaseListener{
     public Map<ParseTree, String> mapNodeStr = new HashMap<>();
     public Map<String, EObject> mapVarEmf = new HashMap<>();
     public Map<String, EObject> mapTypeEmf = new HashMap<>();
-
+    public Map<String, EObject> mapFunEmf = new HashMap<>();
+    public Map<String, EObject> mapMethodEmf = new HashMap<>();
+    public Map<String, EObject> mapFBEmf = new HashMap<>();
 
     //////getEmf()方法，获取节点自身的emf并返回该对象
     private EObject getEmf(ParserRuleContext ctx){

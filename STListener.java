@@ -217,6 +217,16 @@ public interface STListener extends ParseTreeListener {
 	 */
 	void exitMethod_decl(STParser.Method_declContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link STParser#method_name}.
+	 * @param ctx the parse tree
+	 */
+	void enterMethod_name(STParser.Method_nameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link STParser#method_name}.
+	 * @param ctx the parse tree
+	 */
+	void exitMethod_name(STParser.Method_nameContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link STParser#class_decl}.
 	 * @param ctx the parse tree
 	 */
@@ -576,6 +586,16 @@ public interface STListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitContinue_stmt(STParser.Continue_stmtContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link STParser#return_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void enterReturn_stmt(STParser.Return_stmtContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link STParser#return_stmt}.
+	 * @param ctx the parse tree
+	 */
+	void exitReturn_stmt(STParser.Return_stmtContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link STParser#data_type_access}.
 	 * @param ctx the parse tree
