@@ -17,6 +17,11 @@
 //////enum_type_init
 //////array_type_decl
 //////array_type_init
+//////struct_type_decl
+//////struct_type_init
+//////function
+//////fB
+//////program
 ////////////////////////////////////////////////////////////////////////////////////////////// */
 
 /* ///整体思路如下
@@ -29,6 +34,7 @@
 import java.io.IOException;
 import java.io.PipedOutputStream;
 import java.lang.reflect.Array;
+import java.sql.Struct;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,16 +90,17 @@ public class GenModelListener extends STBaseListener{
 //////mapRuleName的作用是，帮助ctx访问子节点的规则类型，方便ctx进行switch...case...语句 */
     public Map<ParseTree, EObject> mapEmf = new HashMap<>();
     public Map<ParseTree, String> mapNodeStr = new HashMap<>();
-
 //////用一个HashMap来记录所有的变量声明，用于在引用变量时快速查找
     public Map<String, EObject> mapVarEmf = new HashMap<>();
-
 //////用一个HashMap来记录所有使用到的类型emf，包括自定义的类型和基本数据类型
     public Map<String, EObject> mapTypeEmf = new HashMap<>();
-
-//////用一个HashMap来记录function
-
+//////用一个HashMap来记录定义的function
+    public Map<String, EObject> mapFunEmf = new HashMap<>();
 //////用一个HashMap来记录method
+    public Map<String, EObject> mapMethodEmf = new HashMap<>();
+//////用一个HashMap来记录定义的function block
+    public Map<String, EObject> mapFBEmf = new HashMap<>();
+
 
 //////setFromChildEmf()方法，获取某个子节点的emf并关联
     private void setFromChildEmf(ParserRuleContext ctx, int i){
@@ -294,6 +301,18 @@ public class GenModelListener extends STBaseListener{
                 }
                 else{emf.setType((Type)mapTypeEmf.get("SINGLE_BYTE_CHAR"));}
             }
+            else if(emf.getLiteral().getType() == LiteralType.REAL){
+                if(mapTypeEmf.get("REAL") == null){
+                    TypeDeclaration typeDeclEmf = declFactory.createTypeDeclaration();
+                    UserDefinedDataType typeEmf = typeFactory.createUserDefinedDataType();
+                    typeDeclEmf.setType(typeEmf);
+                    typeEmf.setTypeDeclaration(typeDeclEmf);
+                    typeEmf.setName("REAL");
+                    mapTypeEmf.put("REAL", typeEmf);
+                    emf.setType(typeEmf);
+                }
+                else{emf.setType((Type)mapTypeEmf.get("REAL"));}
+            }
             else{}
         }
         else if( mapNodeStr.get(ctx.getChild(0)) == "enum_value" ){
@@ -311,10 +330,9 @@ public class GenModelListener extends STBaseListener{
             emf.setTestString("var_access_expr_emf");
         }
         else if( mapNodeStr.get(ctx.getChild(0)) == "func_call" ){
-            FunctionCall emf = exprFactory.createFunctionCall();
-            mapEmf.put(ctx, emf);
-
-            emf.setTestString("fun_call_expr_emf");
+            setFromChildEmf(ctx, 0);
+            FunctionCall emf = (FunctionCall)getEmf(ctx);
+            emf.setTestString("func_call_expr_emf");
         }
         else{ }
     }
@@ -339,17 +357,21 @@ public class GenModelListener extends STBaseListener{
     @Override public void enterStmt_list(STParser.Stmt_listContext ctx) { }
 
     @Override public void exitStmt_list(STParser.Stmt_listContext ctx) { 
-        StatementBody emf = stmtFactory.createStatementBody();
-        mapEmf.put(ctx, emf);
-        for(int i = 0; i < ctx.getChildCount(); i++){
-            ParseTree childNode = ctx.getChild(i);
-            if(childNode instanceof STParser.StmtContext){
-                Statement childEmf0 = (Statement)getChildEmf(ctx, i);
-                childEmf0.setTestString("stmt"+ i);
-                emf.getStatement().add(childEmf0);
+        try{
+            StatementBody emf = stmtFactory.createStatementBody();
+            mapEmf.put(ctx, emf);
+            for(int i = 0; i < ctx.getChildCount(); i++){
+                ParseTree childNode = ctx.getChild(i);
+                if(childNode instanceof STParser.StmtContext){
+                    Statement childEmf0 = (Statement)getChildEmf(ctx, i);
+                    childEmf0.setTestString("stmt"+ i);
+                    emf.getStatement().add(childEmf0);
+                }
             }
+            //System.out.println(emf.getStatement().size());
+        } catch(Exception exception){
+            System.err.println("Error In Stmt_list!!!");
         }
-        //System.out.println(emf.getStatement().size());
     }
 
     @Override public void enterSelection_stmt(STParser.Selection_stmtContext ctx) { }
@@ -564,6 +586,22 @@ public class GenModelListener extends STBaseListener{
         mapEmf.put(ctx, emf);
     }
 
+    @Override public void enterReturn_stmt(STParser.Return_stmtContext ctx) { }
+
+	@Override public void exitReturn_stmt(STParser.Return_stmtContext ctx) { 
+        ReturnStatement emf = stmtFactory.createReturnStatement();
+        mapEmf.put(ctx, emf);
+        try{
+            for(int i = 0; i < ctx.getChildCount(); i++){
+                if(mapNodeStr.get(ctx.getChild(i)) == "expression"){
+                    emf.setExpression(((Expression)mapEmf.get(ctx.getChild(i))));
+                }
+            }
+        } catch(Exception exception){
+            System.err.println("Error In Return_stmt!!!");
+        }
+    }
+
     @Override public void enterCase_stmt(STParser.Case_stmtContext ctx) { 
         CaseStatement emf = stmtFactory.createCaseStatement();
         mapEmf.put(ctx, emf);
@@ -640,8 +678,17 @@ public class GenModelListener extends STBaseListener{
 
     @Override public void enterNumeric_literal(STParser.Numeric_literalContext ctx) { }
 
-    @Override public void exitNumeric_literal(STParser.Numeric_literalContext ctx) { 
-        setFromChildEmf(ctx, 0);
+    @Override public void exitNumeric_literal(STParser.Numeric_literalContext ctx) {
+        if(ctx.getChild(0) instanceof RuleContext){
+            setFromChildEmf(ctx, 0);
+        }
+        else{
+            NumericLiteral emf = liteFactory.createNumericLiteral();
+            mapEmf.put(ctx, emf);
+            emf.setType(LiteralType.REAL);
+            String value = ctx.getText();
+            emf.setValue(value);
+        }
     }
 
     @Override public void enterInt_literal(STParser.Int_literalContext ctx) { }
@@ -655,41 +702,12 @@ public class GenModelListener extends STBaseListener{
         emf.setValue(value);
     }
 
-	@Override public void enterReal_literal(STParser.Real_literalContext ctx) { }
-
-	@Override public void exitReal_literal(STParser.Real_literalContext ctx) { 
-        Literal emf = elemFactory.createLiteral();
-        mapEmf.put(ctx, emf);
-        emf.setType(LiteralType.REAL);
-        String value = ctx.getText();
-        emf.setValue(value);
-    }
-
-	@Override public void enterReal_literal_exponent(STParser.Real_literal_exponentContext ctx) { }
-
-	@Override public void exitReal_literal_exponent(STParser.Real_literal_exponentContext ctx) { 
-        Literal emf = elemFactory.createLiteral();
-        mapEmf.put(ctx, emf);
-        String value = ctx.getText();
-        emf.setValue(value);
-    }
-
 	@Override public void enterBool_literal(STParser.Bool_literalContext ctx) { }
 
 	@Override public void exitBool_literal(STParser.Bool_literalContext ctx) { 
         Literal emf = elemFactory.createLiteral();
         mapEmf.put(ctx, emf);
         emf.setType(LiteralType.BOOLEAN);
-        String value = ctx.getText();
-        emf.setValue(value);
-    }
-
-	@Override public void enterTyped_literal(STParser.Typed_literalContext ctx) { }
-
-	@Override public void exitTyped_literal(STParser.Typed_literalContext ctx) { 
-        Literal emf = elemFactory.createLiteral();
-        mapEmf.put(ctx, emf);
-        emf.setType(LiteralType.TYPED);
         String value = ctx.getText();
         emf.setValue(value);
     }
@@ -722,21 +740,37 @@ public class GenModelListener extends STBaseListener{
                         break;
                     case "subrange_type_decl":
                         SubrangeType emfSubrangeType = typeFactory.createSubrangeType();
+                        emfSubrangeType.setTypeDeclaration(((TypeDeclaration)mapEmf.get(ctx.getParent())));
                         mapEmf.put(ctx, emfSubrangeType);
                         emfSubrangeType.setName(typeName);
                         mapTypeEmf.put(typeName, emfSubrangeType);
                         break;
                     case "enum_type_decl":
                         EnumType emfEnumType = typeFactory.createEnumType();
+                        emfEnumType.setTypeDeclaration(((TypeDeclaration)mapEmf.get(ctx.getParent())));
                         mapEmf.put(ctx, emfEnumType);
                         emfEnumType.setName(typeName);
                         mapTypeEmf.put(typeName, emfEnumType);
                         break;
                     case "array_type_decl":
                         ArrayType emfArrayType = typeFactory.createArrayType();
+                        emfArrayType.setTypeDeclaration(((TypeDeclaration)mapEmf.get(ctx.getParent())));
                         mapEmf.put(ctx, emfArrayType);
                         emfArrayType.setName(typeName);
                         mapTypeEmf.put(typeName, emfArrayType);
+                        break;
+                    case "struct_type_decl":
+                        StructType emfStructType = typeFactory.createStructType();
+                        emfStructType.setTypeDeclaration(((TypeDeclaration)mapEmf.get(ctx.getParent())));
+                        mapEmf.put(ctx, emfStructType);
+                        emfStructType.setName(typeName);
+                        mapTypeEmf.put(typeName, emfStructType);
+                        break;
+                    default:
+                        if(mapTypeEmf.get(typeName) == null){
+                            System.err.println("Error: <type " + typeName + " is not declared!!!>");
+                            System.exit(0);
+                        }
                         break;
                 }
             }
@@ -966,6 +1000,7 @@ public class GenModelListener extends STBaseListener{
 
     @Override public void enterArray_type_decl(STParser.Array_type_declContext ctx) { 
         ArrayTypeDecl emf = declFactory.createArrayTypeDecl();
+        emf.setTestString("array_type_decl testString");
         mapEmf.put(ctx, emf);
     }
 
@@ -996,7 +1031,7 @@ public class GenModelListener extends STBaseListener{
 	@Override public void exitArray_spec(STParser.Array_specContext ctx) { 
         try{
             EObject parentEmf = getParentEmf(ctx);
-            if(parentEmf instanceof Declaration){
+            if(parentEmf instanceof ArrayTypeDecl){
                 setFromParentEmf(ctx);
                 ArrayTypeDecl emf0 = (ArrayTypeDecl)parentEmf;
                 if(mapNodeStr.get(ctx.getChild(0)) == "type_access"){
@@ -1017,6 +1052,7 @@ public class GenModelListener extends STBaseListener{
             }
             else if(parentEmf instanceof Initializer){ 
                 ArrayTypeDecl emf1 = declFactory.createArrayTypeDecl();
+                emf1.setTestString("array_type_decl testString");
                 mapEmf.put(ctx, emf1);
                 if(mapNodeStr.get(ctx.getChild(0)) == "type_access"){
                     emf1.setTypeAccess((Type)getChildEmf(ctx, 0));
@@ -1034,7 +1070,26 @@ public class GenModelListener extends STBaseListener{
                     }
                 }
             }
-            else{ }
+            else if(parentEmf instanceof StructElemDecl){
+                ArrayTypeDecl emf1 = declFactory.createArrayTypeDecl();
+                emf1.setTestString("array_type_decl testString");
+                mapEmf.put(ctx, emf1);
+                if(mapNodeStr.get(ctx.getChild(0)) == "type_access"){
+                    emf1.setTypeAccess((Type)getChildEmf(ctx, 0));
+                }
+                else{ 
+                    for(int i = 0; i < ctx.getChildCount(); i++){
+                        String childNodeStr = mapNodeStr.get(ctx.getChild(i));
+                        if(childNodeStr == "subrange"){
+                            emf1.getSubrange().add((Subrange)getChildEmf(ctx, i));
+                        }
+                        else if(childNodeStr == "data_type_access"){
+                            emf1.setInsideType((Type)getChildEmf(ctx, i));
+                        }
+                        else{ }
+                    }
+                }
+            }
         } catch(Exception exception){
             System.err.println("Error In Array_spec!!!");
         }
@@ -1044,35 +1099,127 @@ public class GenModelListener extends STBaseListener{
 
 	@Override public void exitArray_elem_init_value(STParser.Array_elem_init_valueContext ctx) { 
         try{
-            ArrayValue emf = initFactory.createArrayValue();
+            ArrayElemInit emf = initFactory.createArrayElemInit();
             mapEmf.put(ctx, emf);
-            String childNodeStr = mapNodeStr.get(ctx.getChild(0));
+            ParseTree childNode = ctx.getChild(0);
+            String childNodeStr = mapNodeStr.get(childNode);
             switch(childNodeStr){
                 case "expression":
-                    emf.setValueType(childNodeStr);
-                    ((ArrayElemInit)getParentEmf(ctx)).setValueType(childNodeStr);
+                    emf.setType(((Expression)mapEmf.get(childNode)).getType());
                     emf.setExpression((Expression)getChildEmf(ctx, 0));
                     //System.out.println(((LiteralExpression)emf.getExpression()).getLiteral().getValue());
                     break;
-                case "enum_value":
-                    emf.setValueType(childNodeStr);
-                    ((ArrayElemInit)getParentEmf(ctx)).setValueType(childNodeStr);
-                    emf.setEnum((Literal)getChildEmf(ctx, 0));
-                    break;
                 case "struct_init":
-                    emf.setValueType(childNodeStr);
-                    ((ArrayElemInit)getParentEmf(ctx)).setValueType(childNodeStr);
+                    emf.setStruct((StructInit)getChildEmf(ctx, 0));
                     break;
                 case "array_init":
-                    emf.setValueType(childNodeStr);
-                    ((ArrayElemInit)getParentEmf(ctx)).setValueType(childNodeStr);
-                    emf.setArray((ArrayElemInit)getChildEmf(ctx, 0));
+                    emf.setArray((ArrayInit)getChildEmf(ctx, 0));
                     break;
             }
         }catch(Exception exception){
             System.err.println("Error In Array_elem_init_value!!!");
         }
     }
+
+
+    @Override public void enterStruct_type_decl(STParser.Struct_type_declContext ctx) { 
+        StructTypeDecl emf = declFactory.createStructTypeDecl();
+        mapEmf.put(ctx, emf);
+    }
+
+	@Override public void exitStruct_type_decl(STParser.Struct_type_declContext ctx) { 
+        try{ 
+            StructTypeDecl emf = (StructTypeDecl)getEmf(ctx);
+            for(int i = 0; i < ctx.getChildCount(); i++){
+                String childNodeStr = mapNodeStr.get(ctx.getChild(i));
+                if(childNodeStr == "type_name"){
+                    emf.setType((StructType)getChildEmf(ctx, i));
+                }
+            }
+
+            if(emf.getTypeAccess() == null){
+                //System.out.println(emf.getType().getName() + ": new struct_type_decl");
+            }
+            else{
+                //System.out.println(emf.getType().getName() + ": type_access->" + emf.getTypeAccess().getName());
+            }
+        } catch(Exception exception){
+            System.err.println("Error In Struct_type_decl!!!");
+        }
+    }
+
+	@Override public void enterStruct_spec(STParser.Struct_specContext ctx) { }
+
+	@Override public void exitStruct_spec(STParser.Struct_specContext ctx) { 
+        try{
+            EObject parentEmf = getParentEmf(ctx);
+            if(parentEmf instanceof Declaration){
+                setFromParentEmf(ctx);
+                StructTypeDecl emf0 = (StructTypeDecl)parentEmf;
+                if(mapNodeStr.get(ctx.getChild(0)) == "type_access"){
+                    emf0.setTypeAccess((Type)getChildEmf(ctx, 0));
+                }
+                else{ 
+                    for(int i = 0; i < ctx.getChildCount(); i++){
+                        if(mapNodeStr.get(ctx.getChild(i)) == "struct_elem_decl"){
+                            emf0.getElement().add((StructElemDecl)mapEmf.get(ctx.getChild(i)));
+                        }
+                    }
+                }
+            }
+            else if(parentEmf instanceof Initializer){ 
+                StructTypeDecl emf0 = declFactory.createStructTypeDecl();
+                if(mapNodeStr.get(ctx.getChild(0)) == "type_access"){
+                    emf0.setTypeAccess((Type)getChildEmf(ctx, 0));
+                }
+            }
+            else{ }
+        } catch(Exception exception){
+            System.err.println("Error In Struct_spec!!!");
+        }
+    }
+
+	@Override public void enterStruct_elem_decl(STParser.Struct_elem_declContext ctx) { 
+        StructElemDecl emf = declFactory.createStructElemDecl();
+        mapEmf.put(ctx, emf);
+    }
+
+	@Override public void exitStruct_elem_decl(STParser.Struct_elem_declContext ctx) { 
+        try{
+            StructElemDecl emf = (StructElemDecl)getEmf(ctx);
+            String childNodeStr = mapNodeStr.get(ctx.getChild(2));
+            switch(childNodeStr){
+                case "data_type_access":
+                    emf.setType((Type)mapEmf.get(ctx.getChild(2)));
+                    break;
+                default:
+                    emf.setNoNameType((TypeDeclaration)mapEmf.get(ctx.getChild(2)));
+                    //System.out.println(emf.getNoNameType().getTestString());
+                break;
+            }
+        } catch(Exception exception){
+            System.err.println("Error In Struct_elem_decl!!!");
+        }
+    }
+
+    @Override public void enterStruct_elem_name(STParser.Struct_elem_nameContext ctx) { }
+
+	@Override public void exitStruct_elem_name(STParser.Struct_elem_nameContext ctx) { 
+        try{
+            setFromParentEmf(ctx);
+            if(getEmf(ctx) instanceof StructElemDecl){ 
+                StructElemDecl emf = (StructElemDecl)getEmf(ctx);
+                emf.setName(ctx.getText());
+            }
+            else if(getEmf(ctx) instanceof StructElemInit){
+                StructElemInit emf = (StructElemInit)getEmf(ctx);
+                emf.setName(ctx.getText());
+            }
+        } catch(Exception exception){
+            System.err.println("Error In Struct_elem_name!!!");
+        }
+    }
+
 
     @Override public void enterElem_type_name(STParser.Elem_type_nameContext ctx) { }
 
@@ -1313,17 +1460,14 @@ public class GenModelListener extends STBaseListener{
     }
 
     @Override public void enterIo_var_decls(STParser.Io_var_declsContext ctx) { 
-        ParserRuleContext parentNode = ctx.getParent();
-        VariableDeclaration emf = (VariableDeclaration)mapEmf.get(parentNode);
-        mapEmf.put(ctx, emf);
+        setFromParentEmf(ctx);
     }
 
     @Override public void exitIo_var_decls(STParser.Io_var_declsContext ctx) { }
 
     @Override public void enterVar_decls(STParser.Var_declsContext ctx) { 
-        ParserRuleContext parentNode = ctx.getParent();
-        VariableDeclaration emf = (VariableDeclaration)mapEmf.get(parentNode);
-        mapEmf.put(ctx, emf);
+        setFromParentEmf(ctx);
+        VariableDeclaration emf = (VariableDeclaration)getEmf(ctx);
         emf.setSection(VariableSection.VAR);
         emf.setTestString("var_test");
     }
@@ -1331,9 +1475,8 @@ public class GenModelListener extends STBaseListener{
     @Override public void exitVar_decls(STParser.Var_declsContext ctx) { }
 
     @Override public void enterVar_input_decls(STParser.Var_input_declsContext ctx) { 
-        ParserRuleContext parentNode = ctx.getParent();
-        VariableDeclaration emf = (VariableDeclaration)mapEmf.get(parentNode);
-        mapEmf.put(ctx, emf);
+        setFromParentEmf(ctx);
+        VariableDeclaration emf = (VariableDeclaration)getEmf(ctx);
         emf.setSection(VariableSection.VAR_INPUT);
         emf.setTestString("var_input_test");
     }
@@ -1341,9 +1484,8 @@ public class GenModelListener extends STBaseListener{
     @Override public void exitVar_input_decls(STParser.Var_input_declsContext ctx) { }
 
     @Override public void enterVar_output_decls(STParser.Var_output_declsContext ctx) { 
-        ParserRuleContext parentNode = ctx.getParent();
-        VariableDeclaration emf = (VariableDeclaration)mapEmf.get(parentNode);
-        mapEmf.put(ctx, emf);
+        setFromParentEmf(ctx);
+        VariableDeclaration emf = (VariableDeclaration)getEmf(ctx);
         emf.setSection(VariableSection.VAR_OUTPUT);
         emf.setTestString("var_output_test");
     }
@@ -1351,45 +1493,40 @@ public class GenModelListener extends STBaseListener{
     @Override public void exitVar_output_decls(STParser.Var_output_declsContext ctx) { }
 
     @Override public void enterVar_in_out_decls(STParser.Var_in_out_declsContext ctx) { 
-        ParserRuleContext parentNode = ctx.getParent();
-        VariableDeclaration emf = (VariableDeclaration)mapEmf.get(parentNode);
-        mapEmf.put(ctx, emf);
+        setFromParentEmf(ctx);
+        VariableDeclaration emf = (VariableDeclaration)getEmf(ctx);
         emf.setSection(VariableSection.VAR_IN_OUT);
     }
 
     @Override public void exitVar_in_out_decls(STParser.Var_in_out_declsContext ctx) { }
 
     @Override public void enterVar_external_decls(STParser.Var_external_declsContext ctx) { 
-        ParserRuleContext parentNode = ctx.getParent();
-        VariableDeclaration emf = (VariableDeclaration)mapEmf.get(parentNode);
-        mapEmf.put(ctx, emf);
+        setFromParentEmf(ctx);
+        VariableDeclaration emf = (VariableDeclaration)getEmf(ctx);
         emf.setSection(VariableSection.VAR_EXTERNAL);
     }
 
     @Override public void exitVar_external_decls(STParser.Var_external_declsContext ctx) { }
 
     @Override public void enterVar_global_decls(STParser.Var_global_declsContext ctx) { 
-        ParserRuleContext parentNode = ctx.getParent();
-        VariableDeclaration emf = (VariableDeclaration)mapEmf.get(parentNode);
-        mapEmf.put(ctx, emf);
+        setFromParentEmf(ctx);
+        VariableDeclaration emf = (VariableDeclaration)getEmf(ctx);
         emf.setSection(VariableSection.VAR_EXTERNAL);
     }
 
     @Override public void exitVar_global_decls(STParser.Var_global_declsContext ctx) { }
 
     @Override public void enterVar_temp_decls(STParser.Var_temp_declsContext ctx) { 
-        ParserRuleContext parentNode = ctx.getParent();
-        VariableDeclaration emf = (VariableDeclaration)mapEmf.get(parentNode);
-        mapEmf.put(ctx, emf);
+        setFromParentEmf(ctx);
+        VariableDeclaration emf = (VariableDeclaration)getEmf(ctx);
         emf.setSection(VariableSection.VAR_TEMP);
     }
 
     @Override public void exitVar_temp_decls(STParser.Var_temp_declsContext ctx) { }
 
     @Override public void enterVar_access_decls(STParser.Var_access_declsContext ctx) { 
-        ParserRuleContext parentNode = ctx.getParent();
-        VariableDeclaration emf = (VariableDeclaration)mapEmf.get(parentNode);
-        mapEmf.put(ctx, emf);
+        setFromParentEmf(ctx);
+        VariableDeclaration emf = (VariableDeclaration)getEmf(ctx);
         emf.setSection(VariableSection.VAR_ACCESS);
     }
 
@@ -1435,7 +1572,7 @@ public class GenModelListener extends STBaseListener{
                     break;
                 case "var_access":
                     if(mapVarEmf.get(ctx.getText()) == null){
-                        System.err.println("Error: " + ctx.getText() + " is not declared!!!");
+                        System.err.println("Error: <" + ctx.getText() + " is not declared!!!>");
                         System.exit(0);
                     }
                     Variable emf0 = (Variable)mapVarEmf.get(ctx.getText());
@@ -1446,6 +1583,14 @@ public class GenModelListener extends STBaseListener{
                     break;
                 case "loc_partly_var":
                     
+                    break;
+                case "param_assign":
+                    if(mapVarEmf.get(ctx.getText()) == null){
+                        System.err.println("Error: <" + ctx.getText() + " is not declared!!!>");
+                        System.exit(0);
+                    }
+                    Variable emf3 = (Variable)mapVarEmf.get(ctx.getText());
+                    mapEmf.put(ctx, emf3);
                     break;
                 default: ;
             }
@@ -1598,20 +1743,62 @@ public class GenModelListener extends STBaseListener{
     }
 
     @Override public void enterStruct_spec_init(STParser.Struct_spec_initContext ctx) { 
-/*         VariableInitializer emf = initFactory.createVariableInitializer();
+        StructSpecInit emf = initFactory.createStructSpecInit();
         mapEmf.put(ctx, emf);
-        //emf.setTestString("struct");
-
-        ParserRuleContext parentNode = ctx.getParent();
-        String parentNodeStr = mapNodeStr.get(parentNode);
-        switch(parentNodeStr){
-            case "decl_common_part":
-                mapEmf.put(parentNode, emf);
-                break;
-        } */
+        emf.setTestString("struct_spec_init_emf");
     }
 
 	@Override public void exitStruct_spec_init(STParser.Struct_spec_initContext ctx) { }
+
+	@Override public void enterStruct_init(STParser.Struct_initContext ctx) { 
+        StructInit emf = initFactory.createStructInit();
+        mapEmf.put(ctx, emf);
+    }
+
+	@Override public void exitStruct_init(STParser.Struct_initContext ctx) { 
+        StructInit emf = (StructInit)getEmf(ctx);
+        for(int i = 0; i < ctx.getChildCount(); i++){
+            String childNodeStr = mapNodeStr.get(ctx.getChild(i));
+            if(childNodeStr == "struct_elem_init"){
+                emf.getElemInit().add(((StructElemInit)mapEmf.get(ctx.getChild(i))));
+            }
+        }
+    }
+
+	@Override public void enterStruct_elem_init(STParser.Struct_elem_initContext ctx) { 
+        StructElemInit emf = initFactory.createStructElemInit();
+        mapEmf.put(ctx, emf);
+    }
+
+	@Override public void exitStruct_elem_init(STParser.Struct_elem_initContext ctx) { 
+        try{
+            StructElemInit emf = (StructElemInit)getEmf(ctx);
+            String childNodeStr = mapNodeStr.get(ctx.getChild(2));
+            EObject childEmf = mapEmf.get(ctx.getChild(2));
+            switch(childNodeStr){
+                case"expression":
+                    emf.setExpression((Expression)childEmf);
+                break;
+                case"array_init":
+                    emf.setArray((ArrayInit)childEmf);
+                break;
+                case"struct_init":
+                    emf.setStruct((StructInit)childEmf);
+                break;
+                case"ref_value":
+                
+                break;
+                default:
+                
+                break;
+            }
+
+        } catch(Exception exception){
+            System.err.println("Error In Struct_elem_init!!!");
+        }
+    }
+
+
 
     @Override public void enterSubrange_spec_init(STParser.Subrange_spec_initContext ctx) { 
         SubrangeInit emf = initFactory.createSubrangeInit();
@@ -1673,13 +1860,13 @@ public class GenModelListener extends STBaseListener{
     }
 
     @Override public void enterArray_spec_init(STParser.Array_spec_initContext ctx) { 
-        ArrayInit emf = initFactory.createArrayInit();
+        ArraySpecInit emf = initFactory.createArraySpecInit();
         mapEmf.put(ctx, emf);
     }
 
 	@Override public void exitArray_spec_init(STParser.Array_spec_initContext ctx) { 
         try{
-            ArrayInit emf = (ArrayInit)getEmf(ctx);
+            ArraySpecInit emf = (ArraySpecInit)getEmf(ctx);
             for(int i = 0; i < ctx.getChildCount(); i++){
                 String childNodeStr = mapNodeStr.get(ctx.getChild(i));
                 if(childNodeStr == "array_spec"){
@@ -1689,9 +1876,6 @@ public class GenModelListener extends STBaseListener{
                     else{
                         emf.setType(typeDeclEmf.getType());
                     }
-                }
-                else if(childNodeStr == "array_init"){
-                    emf.setValue((ArrayElemInit)getChildEmf(ctx, i));
                 }
             }
 
@@ -1703,21 +1887,18 @@ public class GenModelListener extends STBaseListener{
         }
     }
 
-	@Override public void enterArray_init(STParser.Array_initContext ctx) { 
-        ArrayElemInit emf = initFactory.createArrayElemInit();
-        mapEmf.put(ctx, emf);
-    }
+	@Override public void enterArray_init(STParser.Array_initContext ctx) { }
 
 	@Override public void exitArray_init(STParser.Array_initContext ctx) { 
         try{
-            ArrayElemInit emf = (ArrayElemInit)getEmf(ctx);
+            ArrayInit emf = initFactory.createArrayInit();
             if(ctx.getChild(1) instanceof TerminalNode){
                 int count = Integer.parseInt(ctx.getChild(1).getText());
-                ArrayValue childEmf = null;
+                ArrayElemInit childEmf = null;
                 for(int i = 0; i < ctx.getChildCount(); i++){
                     String childNodeStr = mapNodeStr.get(ctx.getChild(i));
                     if(childNodeStr == "array_elem_init_value"){
-                        childEmf = (ArrayValue)getChildEmf(ctx, i);
+                        childEmf = (ArrayElemInit)getChildEmf(ctx, i);
                     }
                     else{ }
                 }
@@ -1729,7 +1910,7 @@ public class GenModelListener extends STBaseListener{
                 for(int i = 0; i < ctx.getChildCount(); i++){
                     String childNodeStr = mapNodeStr.get(ctx.getChild(i));
                     if(childNodeStr == "array_elem_init_value"){
-                        emf.getElement().add((ArrayValue)getChildEmf(ctx, i));
+                        emf.getElement().add((ArrayElemInit)getChildEmf(ctx, i));
                     }
                     else{ }
                 }
@@ -1739,4 +1920,182 @@ public class GenModelListener extends STBaseListener{
             System.err.println("Array_init!!!");
         }
     }
+
+
+/* ////////////////////////////////////////////////////////
+//////以下是关于POU的部分
+//////
+//////
+////// */
+	@Override public void enterProg_decl(STParser.Prog_declContext ctx) { 
+        ProgramDeclaration emf = declFactory.createProgramDeclaration();
+        mapEmf.put(ctx, emf);
+    }
+
+	@Override public void exitProg_decl(STParser.Prog_declContext ctx) { 
+        try{
+            ProgramDeclaration emf = (ProgramDeclaration)getEmf(ctx);
+            emf.setProgram((Program)mapEmf.get(ctx.getChild(1)));
+        }catch(Exception exception){
+            System.err.println("Prog_decl!!!");
+        }
+    }
+
+	@Override public void enterProg_name(STParser.Prog_nameContext ctx) { 
+        Program emf = pouFactory.createProgram();
+        emf.setName(ctx.getText());
+        mapEmf.put(ctx, emf);
+    }
+
+	@Override public void exitProg_name(STParser.Prog_nameContext ctx) { }
+
+    @Override public void enterMethod_decl(STParser.Method_declContext ctx) { }
+
+	@Override public void exitMethod_decl(STParser.Method_declContext ctx) { }
+
+    @Override public void enterFunc_decl(STParser.Func_declContext ctx) { 
+        FunctionDeclaration emf = declFactory.createFunctionDeclaration();
+        mapEmf.put(ctx, emf);
+    }
+
+	@Override public void exitFunc_decl(STParser.Func_declContext ctx) { 
+        FunctionDeclaration emf = (FunctionDeclaration)getEmf(ctx);
+        if(mapTypeEmf.get("VOID") == null){
+            ElementaryDataType emfVOID = typeFactory.createElementaryDataType();
+            emfVOID.setName("VOID");
+            emfVOID.setType(PreDefinedEDType.VOID);
+            mapTypeEmf.put("VOID", emfVOID);
+        }
+        try{
+            emf.setType((Type)mapTypeEmf.get("VOID"));
+            for(int i = 0; i < ctx.getChildCount(); i++){
+                String childNodeStr = mapNodeStr.get(ctx.getChild(i));
+                switch(childNodeStr){
+                    case "derived_func_name":
+                        emf.setFunction((Function)mapEmf.get(ctx.getChild(i)));
+                        break;
+                    case "data_type_access":
+                        emf.setType((Type)mapEmf.get(ctx.getChild(i)));
+                        break;
+                    case "using_directive":
+
+                        break;
+                    case "all_var_decls":
+                        emf.getVariableDeclaration().add((VariableDeclaration)mapEmf.get(ctx.getChild(i)));
+                        break;
+                    case "method_decls":
+
+                        break;
+                    case "statements":
+                        emf.setBody((StatementBody)mapEmf.get(ctx.getChild(i)));
+                        break;
+                    default:
+
+                        break;
+                }
+            }
+        } catch(Exception exception){
+            System.err.println("Error in Func_decl!!!");
+        }
+    }
+
+	@Override public void enterFunc_name(STParser.Func_nameContext ctx) { }
+
+	@Override public void exitFunc_name(STParser.Func_nameContext ctx) { 
+        setFromChildEmf(ctx, 0);
+    }
+
+	@Override public void enterStd_func_name(STParser.Std_func_nameContext ctx) { }
+
+	@Override public void exitStd_func_name(STParser.Std_func_nameContext ctx) { }
+
+	@Override public void enterDerived_func_name(STParser.Derived_func_nameContext ctx) { }
+
+	@Override public void exitDerived_func_name(STParser.Derived_func_nameContext ctx) { 
+        try{
+            String funcName = ctx.getText();
+            if(mapNodeStr.get(ctx.getParent()) == "func_decl"){
+                if(mapFunEmf.get(funcName) == null){
+                    Function emf = pouFactory.createFunction();
+                    mapEmf.put(ctx, emf);
+                    emf.setName(funcName);
+                    mapFunEmf.put(funcName, emf);
+                    emf.setDeclaration(((FunctionDeclaration)mapEmf.get(ctx.getParent())));
+                }
+                else{
+                    System.err.println(funcName + " already exsit!!!");
+                    System.exit(0);
+                }
+            }
+            else if(mapNodeStr.get(ctx.getParent()) == "func_name"){
+                if(mapFunEmf.get(funcName) == null){
+                    System.err.println(funcName + " is not declared!!!");
+                    System.exit(0);
+                }
+                else{
+                    Function emf = (Function)mapFunEmf.get(funcName);
+                    mapEmf.put(ctx, emf);
+                }
+            }
+            else{ }
+        } catch(Exception exception){
+            System.err.println("Error in Derived_func_name!!!");
+        }
+    }
+
+	@Override public void enterFunc_call(STParser.Func_callContext ctx) { 
+        FunctionCall emf = exprFactory.createFunctionCall();
+        mapEmf.put(ctx, emf);
+    }
+
+	@Override public void exitFunc_call(STParser.Func_callContext ctx) { 
+        try{
+            FunctionCall emf = (FunctionCall)getEmf(ctx);
+            Function emfFunction = (Function)getChildEmf(ctx, 0);
+            emf.setFunction(emfFunction);
+            emf.setType(emfFunction.getDeclaration().getType());
+            //System.out.println(emf.getType().getName());
+        } catch(Exception exception){
+            System.err.println("Error in Func_call!!!");
+        }
+    }
+
+	@Override public void enterFunc_access(STParser.Func_accessContext ctx) { }
+
+	@Override public void exitFunc_access(STParser.Func_accessContext ctx) { 
+        setFromChildEmf(ctx, 0);
+    }
+
+    @Override public void enterParam_assign(STParser.Param_assignContext ctx) { 
+        Parameter emf = exprFactory.createParameter();
+        mapEmf.put(ctx, emf);
+    }
+
+	@Override public void exitParam_assign(STParser.Param_assignContext ctx) { 
+        try{
+            Parameter emf = (Parameter)getEmf(ctx);
+            for(int i = 0; i < ctx.getChildCount(); i++){
+                String childNodeStr = mapNodeStr.get(ctx.getChild(i));
+                switch(childNodeStr){
+                    case "variable_name":
+                        emf.setName(((Variable)mapEmf.get(ctx.getChild(i))).getName());
+                        //System.out.println(emf.getName());
+                        break;
+                    case "expression":
+                        emf.setExpression((Expression)mapEmf.get(ctx.getChild(i)));
+                        //System.out.println(emf.getExpression().getType().getName());
+                        break;
+                    case "ref_assign":
+
+                        break;
+                    default:
+
+                        break;
+                }
+            }
+        } catch(Exception exception){
+            System.err.println("Error in Param_assign!!!");
+        }
+    }
+
 }

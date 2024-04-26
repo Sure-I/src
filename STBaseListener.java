@@ -268,6 +268,18 @@ public class STBaseListener implements STListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterMethod_name(STParser.Method_nameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitMethod_name(STParser.Method_nameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterClass_decl(STParser.Class_declContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -700,6 +712,18 @@ public class STBaseListener implements STListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterReturn_stmt(STParser.Return_stmtContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitReturn_stmt(STParser.Return_stmtContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterData_type_access(STParser.Data_type_accessContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -1048,30 +1072,6 @@ public class STBaseListener implements STListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterStruct_spec_init(STParser.Struct_spec_initContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitStruct_spec_init(STParser.Struct_spec_initContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterStruct_decl(STParser.Struct_declContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitStruct_decl(STParser.Struct_declContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterStruct_elem_decl(STParser.Struct_elem_declContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -1084,13 +1084,13 @@ public class STBaseListener implements STListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterStruct_elem_name(STParser.Struct_elem_nameContext ctx) { }
+	@Override public void enterStruct_spec_init(STParser.Struct_spec_initContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitStruct_elem_name(STParser.Struct_elem_nameContext ctx) { }
+	@Override public void exitStruct_spec_init(STParser.Struct_spec_initContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -1115,6 +1115,18 @@ public class STBaseListener implements STListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitStruct_elem_init(STParser.Struct_elem_initContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterStruct_elem_name(STParser.Struct_elem_nameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitStruct_elem_name(STParser.Struct_elem_nameContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -1600,30 +1612,6 @@ public class STBaseListener implements STListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterReal_literal(STParser.Real_literalContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitReal_literal(STParser.Real_literalContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterReal_literal_exponent(STParser.Real_literal_exponentContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitReal_literal_exponent(STParser.Real_literal_exponentContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterBool_literal(STParser.Bool_literalContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -1636,13 +1624,13 @@ public class STBaseListener implements STListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterTyped_literal(STParser.Typed_literalContext ctx) { }
+	@Override public void enterBit_str_literal(STParser.Bit_str_literalContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitTyped_literal(STParser.Typed_literalContext ctx) { }
+	@Override public void exitBit_str_literal(STParser.Bit_str_literalContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
