@@ -732,51 +732,55 @@ public class GenModelListener extends STBaseListener{
     @Override public void exitType_name(STParser.Type_nameContext ctx) { 
         try{
             String typeName = ctx.getText();
-            if(mapTypeEmf.get(typeName) == null){
-                String parentNodeStr = mapNodeStr.get(ctx.getParent());
-                switch(parentNodeStr){
-                    case "simple_type_decl":
-        
-                        break;
-                    case "subrange_type_decl":
+            String parentNodeStr = mapNodeStr.get(ctx.getParent());
+            switch(parentNodeStr){
+                case "simple_type_decl":
+    
+                    break;
+                case "subrange_type_decl":
+                    if(mapTypeEmf.get(typeName) == null){ 
                         SubrangeType emfSubrangeType = typeFactory.createSubrangeType();
                         emfSubrangeType.setTypeDeclaration(((TypeDeclaration)mapEmf.get(ctx.getParent())));
                         mapEmf.put(ctx, emfSubrangeType);
                         emfSubrangeType.setName(typeName);
                         mapTypeEmf.put(typeName, emfSubrangeType);
-                        break;
-                    case "enum_type_decl":
-                        EnumType emfEnumType = typeFactory.createEnumType();
-                        emfEnumType.setTypeDeclaration(((TypeDeclaration)mapEmf.get(ctx.getParent())));
-                        mapEmf.put(ctx, emfEnumType);
-                        emfEnumType.setName(typeName);
-                        mapTypeEmf.put(typeName, emfEnumType);
-                        break;
-                    case "array_type_decl":
-                        ArrayType emfArrayType = typeFactory.createArrayType();
-                        emfArrayType.setTypeDeclaration(((TypeDeclaration)mapEmf.get(ctx.getParent())));
-                        mapEmf.put(ctx, emfArrayType);
-                        emfArrayType.setName(typeName);
-                        mapTypeEmf.put(typeName, emfArrayType);
-                        break;
-                    case "struct_type_decl":
-                        StructType emfStructType = typeFactory.createStructType();
-                        emfStructType.setTypeDeclaration(((TypeDeclaration)mapEmf.get(ctx.getParent())));
-                        mapEmf.put(ctx, emfStructType);
-                        emfStructType.setName(typeName);
-                        mapTypeEmf.put(typeName, emfStructType);
-                        break;
-                    default:
-                        if(mapTypeEmf.get(typeName) == null){
-                            System.err.println("Error: <type " + typeName + " is not declared!!!>");
-                            System.exit(0);
-                        }
-                        break;
-                }
-            }
-            else{
-                Type emf0 = (Type)mapTypeEmf.get(typeName);
-                mapEmf.put(ctx, emf0);
+                    }
+                    else{
+                        System.err.println("Error: < type '" + typeName + "' is already exist >");
+                        System.exit(0);
+                    }
+                    break;
+                case "enum_type_decl":
+                    EnumType emfEnumType = typeFactory.createEnumType();
+                    emfEnumType.setTypeDeclaration(((TypeDeclaration)mapEmf.get(ctx.getParent())));
+                    mapEmf.put(ctx, emfEnumType);
+                    emfEnumType.setName(typeName);
+                    mapTypeEmf.put(typeName, emfEnumType);
+                    break;
+                case "array_type_decl":
+                    ArrayType emfArrayType = typeFactory.createArrayType();
+                    emfArrayType.setTypeDeclaration(((TypeDeclaration)mapEmf.get(ctx.getParent())));
+                    mapEmf.put(ctx, emfArrayType);
+                    emfArrayType.setName(typeName);
+                    mapTypeEmf.put(typeName, emfArrayType);
+                    break;
+                case "struct_type_decl":
+                    StructType emfStructType = typeFactory.createStructType();
+                    emfStructType.setTypeDeclaration(((TypeDeclaration)mapEmf.get(ctx.getParent())));
+                    mapEmf.put(ctx, emfStructType);
+                    emfStructType.setName(typeName);
+                    mapTypeEmf.put(typeName, emfStructType);
+                    break;
+                default:
+                    if(mapTypeEmf.get(typeName) == null){
+                        System.err.println("Error: <type " + typeName + " is not declared!!!>");
+                        System.exit(0);
+                    }
+                    else{
+                        Type emf0 = (Type)mapTypeEmf.get(typeName);
+                        mapEmf.put(ctx, emf0);
+                    }
+                    break;
             }
         } catch(Exception exception){
             System.err.println("Error In Type_name!!!");
@@ -866,6 +870,7 @@ public class GenModelListener extends STBaseListener{
                 mapEmf.put(ctx, emf1);
                 if(mapNodeStr.get(ctx.getChild(0)) == "type_access"){
                     emf1.setTypeAccess((Type)getChildEmf(ctx, 0));
+                    ((SubrangeInit)parentEmf).setType((Type)getChildEmf(ctx, 0));
                 }
                 else{ 
                     emf1.setBaseType((ElementaryDataType)getChildEmf(ctx, 0));
@@ -944,6 +949,7 @@ public class GenModelListener extends STBaseListener{
                 mapEmf.put(ctx, emf1);
                 if(mapNodeStr.get(ctx.getChild(0)) == "type_access"){
                     emf1.setTypeAccess((Type)getChildEmf(ctx, 0));
+                    ((EnumInit)parentEmf).setType((Type)getChildEmf(ctx, 0));
                 }
                 else{ 
                     for(int i = 0; i < ctx.getChildCount(); i++){
@@ -1056,6 +1062,7 @@ public class GenModelListener extends STBaseListener{
                 mapEmf.put(ctx, emf1);
                 if(mapNodeStr.get(ctx.getChild(0)) == "type_access"){
                     emf1.setTypeAccess((Type)getChildEmf(ctx, 0));
+                    ((ArraySpecInit)parentEmf).setType((Type)getChildEmf(ctx, 0));
                 }
                 else{ 
                     for(int i = 0; i < ctx.getChildCount(); i++){
@@ -1171,6 +1178,7 @@ public class GenModelListener extends STBaseListener{
                 StructTypeDecl emf0 = declFactory.createStructTypeDecl();
                 if(mapNodeStr.get(ctx.getChild(0)) == "type_access"){
                     emf0.setTypeAccess((Type)getChildEmf(ctx, 0));
+                    ((StructSpecInit)parentEmf).setType((Type)getChildEmf(ctx, 0));
                 }
             }
             else{ }
@@ -1561,14 +1569,18 @@ public class GenModelListener extends STBaseListener{
             switch(parentNodeStr){
                 case "variable_list":
                     VariableList parentEmf = (VariableList)mapEmf.get(parentNode);
+                    if(mapVarEmf.get(ctx.getText()) == null){
+                        Variable emf = elemFactory.createVariable();
+                        mapEmf.put(ctx, emf);
+                        emf.setVariableList(parentEmf);
 
-                    Variable emf = elemFactory.createVariable();
-                    mapEmf.put(ctx, emf);
-                    emf.setVariableList(parentEmf);
-
-                    String name = ctx.getText();
-                    emf.setName(name);
-                    mapVarEmf.put(name, emf);
+                        String name = ctx.getText();
+                        emf.setName(name);
+                        mapVarEmf.put(name, emf);
+                    }
+                    else{ 
+                        System.err.println("Error: <" + ctx.getText() + " is already exist!!!>");
+                    }
                     break;
                 case "var_access":
                     if(mapVarEmf.get(ctx.getText()) == null){
@@ -1621,21 +1633,30 @@ public class GenModelListener extends STBaseListener{
 
 	@Override public void exitSymbolic_variable(STParser.Symbolic_variableContext ctx) {
         try{
-            for(int i = 0; i < ctx.getChildCount(); i++){ 
-                ParseTree childNode = ctx.getChild(0);
-                String childNodeStr = mapNodeStr.get(childNode);
-                switch(childNodeStr){
-                    case "namespace_name":
+            ParseTree childNode = ctx.getChild(0);
+            String childNodeStr = mapNodeStr.get(childNode);
+            if(childNodeStr == "var_access"){
+                Variable emf0 = (Variable)mapEmf.get(childNode);
+                mapEmf.put(ctx, emf0);
+            }
+            else{ 
+                for(int i = 0; i < ctx.getChildCount(); i++){ 
+                    childNodeStr = mapNodeStr.get(ctx.getChild(i));
+                    switch(childNodeStr){
+                        case "THIS":
 
-                        break;
-                    case "var_access":
-                        Variable emf0 = (Variable)mapEmf.get(childNode);
-                        mapEmf.put(ctx, emf0);
-                        break;
-                    case "multi_elem_var":
+                            break;
+                        case "namespace_name":
 
-                        break;
-                    default: ;
+                            break;
+                        case "var_access":
+
+                            break;
+                        case "multi_elem_var":
+
+                            break;
+                        default: ;
+                    }
                 }
             }
         } catch(Exception exception){
@@ -1701,7 +1722,10 @@ public class GenModelListener extends STBaseListener{
                 if(childNode instanceof STParser.Variable_nameContext){
                     Variable varEmf = (Variable)mapEmf.get(childNode);
                     //System.out.println("var_name:" + varEmf.getName());
-                    if(emf.getType() == null){ }
+                    if(emf.getType() == null){ 
+                        //System.err.println(varEmf.getName() + ": No Type Obtained In Decl_common_part!!!");
+                        //System.exit(0);
+                    }
                     else{
                         variableListEmf.setType(emf.getType());
                         varEmf.setType(emf.getType());
@@ -2051,9 +2075,23 @@ public class GenModelListener extends STBaseListener{
 	@Override public void exitFunc_call(STParser.Func_callContext ctx) { 
         try{
             FunctionCall emf = (FunctionCall)getEmf(ctx);
-            Function emfFunction = (Function)getChildEmf(ctx, 0);
-            emf.setFunction(emfFunction);
-            emf.setType(emfFunction.getDeclaration().getType());
+            for(int i =0; i < ctx.getChildCount(); i++){
+                String childNodeStr = mapNodeStr.get(ctx.getChild(i));
+                switch(childNodeStr){
+                    case "func_access":
+                        Function emfFunction = (Function)getChildEmf(ctx, 0);
+                        emf.setFunction(emfFunction);
+                        emf.setType(emfFunction.getDeclaration().getType());
+                        break;
+                    case "param_assign":
+                        emf.getParameter().add((Parameter)mapEmf.get(ctx.getChild(i)));
+                        break;
+                    default:
+
+                        break;
+
+                }
+            }
             //System.out.println(emf.getType().getName());
         } catch(Exception exception){
             System.err.println("Error in Func_call!!!");

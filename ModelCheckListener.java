@@ -6,38 +6,49 @@
 
 /////////////已编写规则条目如下，<>规则写在GenModelListener中，[]规则写在ModelCheckListener中
 //////*<使用未声明变量> 于exitVariable_name*/
+//////*<新声明变量名已存在> 于exitVariable_name*/
 //////*<使用未声明自定义类型> 于exitType_name*/
-//////*<调用不存在的函数> */
+//////*<声明自类型名已存在> 于exitType_name*/
+//////*<调用不存在的函数> 于derived_func_name*/
 //////*<实例化的功能块名称不存在> */
 //////*<使用了未定义的接口>*/
 //////*<指定为基础的功能块不存在或不是功能块>*/
 //////*<调用未实例化的功能块> */
 //////*[接口指定的方法之一尚未由实现的功能块提供]*/
 //////*[常量值超过数据类型范围]*/
-//////*[expression操作数类型不匹配] 于ExitExpression*/
+//////*[expression操作数类型不匹配] 于exitExpression*/
 //////*[赋值语句中变量与表达式类型不匹配]  于exitAssign_stmt*/
 //////*[enum类型变量赋值不在定义中] */
 //////*[数组的初始化，分配值与数组大小不符合] */
 //////*[数组访问下标超过数组大小] */
 //////*[不是数组的数据类型用 '[]' 索引] */
-//////*[访问非struct成员]*/
+//////*<访问非struct成员> 于exitSymbolic_variable*/
 //////*[for循环计数器变量未正确初始化]*/
 //////*[未指定字符串的长度，'(' 之后的字符串大小未定义]*/
-//////*[在函数调用中定义了一个局部变量] */
-//////*[局部变量在函数调用中作为输出处理] */
-//////*[传递给被调用函数的参数过多或过少] */
-//////*[传递给被调用函数的参数不匹配] */
+//////*[在函数调用中定义了一个局部变量] 于exitFunc_call*/
+//////*[局部变量在函数调用中作为输出处理] 于exitFunc_call*/
+//////*[传递给被调用函数的参数过多或过少] 于exitFunc_call*/
+//////*[传递给被调用函数的参数不匹配] 于exitFunc_call*/
 ///////////////////////////////////////////////////////////////////////////////////////////////// */
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.antlr.v4.runtime.CharStream;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.codegen.model.decl.Decl;
+import org.antlr.v4.parse.ANTLRParser.delegateGrammar_return;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.antlr.v4.runtime.tree.TerminalNode;
+
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.common.util.ECollections;
+import org.eclipse.emf.common.util.EList;
 
 import st.basics.*;
 import st.elements.*;
@@ -214,27 +225,83 @@ public class ModelCheckListener extends STBaseListener{
     }
 
     @Override public void exitAssign_stmt(STParser.Assign_stmtContext ctx) { 
-        AssignmentStatement emf = (AssignmentStatement)getEmf(ctx);
-        if(emf.getExpression() == null){ }
-        else{
-            if(compareType(emf.getVariable(), emf.getExpression())){ }
+        try{ 
+            AssignmentStatement emf = (AssignmentStatement)getEmf(ctx);
+            if(emf.getExpression() == null){ }
             else{
-                System.err.println("[ Type is not compatible in: " + ctx.getText() + " ]");
-                System.exit(0);
+                if(compareType(emf.getVariable(), emf.getExpression())){ }
+                else{
+                    System.err.println("[ Type is not compatible in: " + ctx.getText() + " ]");
+                    System.exit(0);
+                }
             }
+        } catch(Exception exception){
+            System.err.println("Error In ModelCheck Assign_stmt!!! '" +  ctx.getText() + "': Can not Get type");
         }
     }
 
-    @Override public void exitSimple_spec_init(STParser.Simple_spec_initContext ctx) { 
-/*         SimpleInit emf = (SimpleInit)getEmf(ctx);
-        if(emf.getValue() == null){ }
-        else{
-            if(compareType(emf.getType(), emf.getValue())){ }
-            else{
-                System.err.println("Type is not compatible in: " + ctx.getText());
-                System.exit(0);
+    //通过比对实际传入参数与function所定义的参数，判定参数传入的正确性
+    @Override public void exitFunc_call(STParser.Func_callContext ctx) { 
+        try{
+            FunctionCall emf = (FunctionCall)getEmf(ctx);
+            Function emfFunction = emf.getFunction();
+
+            EList<Parameter> funParam = emf.getParameter();
+
+            EList<Variable> inputVariables = ECollections.newBasicEList();
+            for(int i = 0; i < emfFunction.getDeclaration().getVariableDeclaration().size(); i++){
+                if(emfFunction.getDeclaration().getVariableDeclaration().get(i).getSection() == VariableSection.VAR_INPUT){
+                    VariableDeclaration emfVariableDeclaration = emfFunction.getDeclaration().getVariableDeclaration().get(i);
+                    for(int j = 0;  j < emfVariableDeclaration.getInitializer().size(); j++){
+                        for(int k = 0; k < emfVariableDeclaration.getInitializer().get(j).getVariableList().getVariable().size(); k++){
+                            //System.out.println(emfVariableDeclaration.getInitializer().get(j).getVariableList().getVariable().get(k).getName());
+                            inputVariables.add(emfVariableDeclaration.getInitializer().get(j).getVariableList().getVariable().get(k));
+                        }
+                    }
+                }
             }
-        } */
+
+            if(funParam.size() == inputVariables.size()){
+                for(int i = 0; i < funParam.size(); i++){
+                    for(int j = 0; j < inputVariables.size(); j++){
+                        if(funParam.get(i).getName() == inputVariables.get(j).getName()){
+                            break;
+                        }
+                        else{ }
+                        if(j == (inputVariables.size()-1)){
+                            System.err.println("[ input parameter does not match in " + ctx.getText() + " ]");
+                            System.exit(0);
+                        }
+                        else{ }
+                    }
+                }
+                for(int i = 0; i < inputVariables.size(); i++){
+                    for(int j = 0; j < funParam.size(); j++){
+                        if(inputVariables.get(i).getName() == funParam.get(j).getName()){
+                            break;
+                        }
+                        else{ }
+                        if(j == (funParam.size()-1)){
+                            System.err.println("[ input parameter does not match in " + ctx.getText() + " ]");
+                            System.exit(0);
+                        }
+                        else{ }
+                    }
+                }
+            }
+            else{
+                if(inputVariables.size() == 0){
+                    System.err.println("[ defined element type error in FUNCTION '" + emfFunction.getName() + "' ]");
+                    System.exit(0);
+                }
+                else{ 
+                    System.err.println("[ parameter does not match in " + ctx.getText() + " ]");
+                    System.exit(0);
+                }
+            }
+        } catch(Exception exception){
+            System.err.println("Error in ModelCheck Func_call!!!");
+        }
     }
 
 }
