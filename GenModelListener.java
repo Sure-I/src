@@ -1188,9 +1188,11 @@ public class GenModelListener extends STBaseListener{
                 }
             }
             else if(parentEmf instanceof Initializer){ 
-                StructTypeDecl emf0 = declFactory.createStructTypeDecl();
                 if(mapNodeStr.get(ctx.getChild(0)) == "type_access"){
-                    emf0.setTypeAccess((Type)getChildEmf(ctx, 0));
+                    StructType type = (StructType)getChildEmf(ctx, 0);
+                    StructTypeDecl emf0 = (StructTypeDecl)type.getTypeDeclaration();
+                    mapEmf.put(ctx, emf0);
+                    
                     ((StructSpecInit)parentEmf).setType((Type)getChildEmf(ctx, 0));
                 }
             }
@@ -1785,7 +1787,11 @@ public class GenModelListener extends STBaseListener{
         emf.setTestString("struct_spec_init_emf");
     }
 
-	@Override public void exitStruct_spec_init(STParser.Struct_spec_initContext ctx) { }
+	@Override public void exitStruct_spec_init(STParser.Struct_spec_initContext ctx) { 
+        StructSpecInit emf = (StructSpecInit)getEmf(ctx);
+
+        emf.setStructInit((StructInit)mapEmf.get(ctx.getChild(2)));
+    }
 
 	@Override public void enterStruct_init(STParser.Struct_initContext ctx) { 
         StructInit emf = initFactory.createStructInit();
