@@ -18,7 +18,8 @@
 //////*[常量值超过数据类型范围]*/
 //////*[expression操作数类型不匹配] 于exitExpression*/
 //////*[赋值语句中变量与表达式类型不匹配]  于exitAssign_stmt*/
-//////*[enum类型变量赋值不在定义中] */
+//////*[enum类型变量赋值不在定义中] 于exitQuote_value  存在问题，value值相同，却判断为不同*/
+//////*[enum类型变量初始化问题] 于exitEnum_spec_init  存在问题同上*/
 //////*[数组的初始化，分配值与数组大小不符合] */
 //////*[数组访问下标超过数组大小] */
 //////*[不是数组的数据类型用 '[]' 索引] */
@@ -302,6 +303,37 @@ public class ModelCheckListener extends STBaseListener{
         } catch(Exception exception){
             System.err.println("Error in ModelCheck Func_call!!!");
         }
+    }
+
+
+    @Override public void exitEnum_spec_init(STParser.Enum_spec_initContext ctx) { 
+        try{
+
+            EnumInit emf = (EnumInit)getEmf(ctx);
+            EnumTypeDecl declEmf;
+            if(emf.getType() == null){
+                declEmf = (EnumTypeDecl)emf.getNoNameType();
+            }
+            else{
+                EnumType typeEmf = (EnumType)emf.getType();
+                declEmf = (EnumTypeDecl)typeEmf.getTypeDeclaration();
+            }
+
+            QuoteValue valueEmf = (QuoteValue)mapEmf.get(ctx.getChild(2));
+            String valueString = valueEmf.getEnumValue().getValue();
+            //System.out.println(valueString);
+
+            for(int i = 0; i < declEmf.getEnumValue().size(); i++){
+                System.out.println(declEmf.getEnumValue().get(i).getValue());
+                if(valueString == (declEmf.getEnumValue().get(i).getValue())) break;
+                if(i == (declEmf.getEnumValue().size() - 1)){
+                    System.err.println("Error: " + ctx.getParent().getText() + " [ '" + valueString + "' does not match any value in enum type ]");
+                }
+            }
+        } catch(Exception exception){
+            System.err.println("Error in ModelCheck Enum_spec_init");
+        }
+
     }
 
 }

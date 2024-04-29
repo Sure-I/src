@@ -334,6 +334,13 @@ public class GenModelListener extends STBaseListener{
             FunctionCall emf = (FunctionCall)getEmf(ctx);
             emf.setTestString("func_call_expr_emf");
         }
+        else if( mapNodeStr.get(ctx.getChild(0)) == "quote_value" ){ 
+            QuotevalueExpression emf = exprFactory.createQuotevalueExpression();
+            mapEmf.put(ctx, emf);
+            QuoteValue valueEmf = (QuoteValue)mapEmf.get(ctx.getChild(0));
+            emf.setQuoteValue(valueEmf);
+            emf.setType(valueEmf.getQuoteType());
+        }
         else{ }
     }
 
@@ -456,6 +463,10 @@ public class GenModelListener extends STBaseListener{
                     else if(childEmf instanceof Expression){
                         Expression childEmf1 = (Expression)childEmf;
                         emf0.setExpression(childEmf1);
+                    }
+                    else if(childEmf instanceof QuoteValue){
+                        QuoteValue childEmf1 = (QuoteValue)childEmf;
+                        emf0.setQuoteValue(childEmf1);
                     }
                     else{ }
                 }
@@ -980,10 +991,12 @@ public class GenModelListener extends STBaseListener{
             for(int i = 0; i < ctx.getChildCount(); i++){
                 String childNodeStr = mapNodeStr.get(ctx.getChild(i));
                 if(childNodeStr == "type_name"){
-                    emf.setTypeName(ctx.getChild(i).getText());
+                    emf.setQuoteType((Type)mapTypeEmf.get(ctx.getChild(i).getText()));
+                    //System.out.println(ctx.getChild(i).getText());
                 }
                 else if(childNodeStr == "enum_value"){
-                    emf.setValue(ctx.getChild(i).getText());
+                    emf.setEnumValue((Literal)mapEmf.get(ctx.getChild(i)));
+                    //System.out.println(emf.getEnumValue().getValue());
                 }
                 else{ }
             }
