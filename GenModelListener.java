@@ -1555,10 +1555,6 @@ public class GenModelListener extends STBaseListener{
 
     @Override public void exitVar_access_decls(STParser.Var_access_declsContext ctx) { }
 
-    @Override public void enterVar_local_decls(STParser.Var_local_declsContext ctx) { }
-
-    @Override public void exitVar_local_decls(STParser.Var_local_declsContext ctx) { }
-
     @Override public void enterVariable_list(STParser.Variable_listContext ctx) { 
         VariableList emf = varFactory.createVariableList();
         mapEmf.put(ctx, emf);
