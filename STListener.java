@@ -147,16 +147,6 @@ public interface STListener extends ParseTreeListener {
 	 */
 	void exitFunc_call(STParser.Func_callContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link STParser#func_access}.
-	 * @param ctx the parse tree
-	 */
-	void enterFunc_access(STParser.Func_accessContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#func_access}.
-	 * @param ctx the parse tree
-	 */
-	void exitFunc_access(STParser.Func_accessContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link STParser#fb_decl}.
 	 * @param ctx the parse tree
 	 */
@@ -196,6 +186,16 @@ public interface STListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitDerived_fb_name(STParser.Derived_fb_nameContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link STParser#fb_elem_name}.
+	 * @param ctx the parse tree
+	 */
+	void enterFb_elem_name(STParser.Fb_elem_nameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link STParser#fb_elem_name}.
+	 * @param ctx the parse tree
+	 */
+	void exitFb_elem_name(STParser.Fb_elem_nameContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link STParser#fb_instance_name}.
 	 * @param ctx the parse tree

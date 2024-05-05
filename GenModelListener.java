@@ -1561,13 +1561,17 @@ public class GenModelListener extends STBaseListener{
     }
 
 	@Override public void exitVariable_list(STParser.Variable_listContext ctx) { 
-        VariableList emf = (VariableList)getEmf(ctx);
-        for(int i = 0; i < ctx.getChildCount(); i++){
-            ParseTree childNode = ctx.getChild(i);
-            if(childNode instanceof STParser.Variable_nameContext){
-                Variable varEmf = (Variable)mapEmf.get(childNode);
-                emf.getVariable().add(varEmf);
+        try{ 
+            VariableList emf = (VariableList)getEmf(ctx);
+            for(int i = 0; i < ctx.getChildCount(); i++){
+                ParseTree childNode = ctx.getChild(i);
+                if(childNode instanceof STParser.Variable_nameContext){
+                    Variable varEmf = (Variable)mapEmf.get(childNode);
+                    emf.getVariable().add(varEmf);
+                }
             }
+        } catch(Exception exception){
+            System.err.println("Error In Variable_list!!!");
         }
     }
 
@@ -1988,9 +1992,24 @@ public class GenModelListener extends STBaseListener{
 
 	@Override public void exitProg_name(STParser.Prog_nameContext ctx) { }
 
-    @Override public void enterMethod_decl(STParser.Method_declContext ctx) { }
+    @Override public void enterMethod_decl(STParser.Method_declContext ctx) { 
+        MethodDeclaration emf = declFactory.createMethodDeclaration();
+        mapEmf.put(ctx, emf);
+    }
 
-	@Override public void exitMethod_decl(STParser.Method_declContext ctx) { }
+	@Override public void exitMethod_decl(STParser.Method_declContext ctx) { 
+        try{
+            MethodDeclaration emf = (MethodDeclaration)getEmf(ctx);
+
+
+        } catch(Exception exception){
+            System.err.println("Error in Method_decl!!!");
+        }
+    }
+
+    @Override public void enterMethod_name(STParser.Method_nameContext ctx) { }
+
+	@Override public void exitMethod_name(STParser.Method_nameContext ctx) { }
 
     @Override public void enterFunc_decl(STParser.Func_declContext ctx) { 
         FunctionDeclaration emf = declFactory.createFunctionDeclaration();
@@ -2093,7 +2112,7 @@ public class GenModelListener extends STBaseListener{
             for(int i =0; i < ctx.getChildCount(); i++){
                 String childNodeStr = mapNodeStr.get(ctx.getChild(i));
                 switch(childNodeStr){
-                    case "func_access":
+                    case "func_name":
                         Function emfFunction = (Function)getChildEmf(ctx, 0);
                         emf.setFunction(emfFunction);
                         emf.setType(emfFunction.getDeclaration().getType());
@@ -2111,12 +2130,6 @@ public class GenModelListener extends STBaseListener{
         } catch(Exception exception){
             System.err.println("Error in Func_call!!!");
         }
-    }
-
-	@Override public void enterFunc_access(STParser.Func_accessContext ctx) { }
-
-	@Override public void exitFunc_access(STParser.Func_accessContext ctx) { 
-        setFromChildEmf(ctx, 0);
     }
 
     @Override public void enterParam_assign(STParser.Param_assignContext ctx) { 
