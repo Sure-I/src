@@ -268,60 +268,42 @@ public class ModelCheckListener extends STBaseListener{
         try{
             FunctionCall emf = (FunctionCall)getEmf(ctx);
             Function emfFunction = emf.getFunction();
+            FunctionDeclaration emfFuncDecl = (FunctionDeclaration)emfFunction.getDeclaration();
 
             EList<Parameter> funParam = emf.getParameter();
 
             EList<Variable> inputVariables = ECollections.newBasicEList();
-            for(int i = 0; i < emfFunction.getDeclaration().getVariableDeclaration().size(); i++){
-                if(emfFunction.getDeclaration().getVariableDeclaration().get(i).getSection() == VariableSection.VAR_INPUT){
-                    VariableDeclaration emfVariableDeclaration = emfFunction.getDeclaration().getVariableDeclaration().get(i);
-                    for(int j = 0;  j < emfVariableDeclaration.getInitializer().size(); j++){
-                        for(int k = 0; k < emfVariableDeclaration.getInitializer().get(j).getVariableList().getVariable().size(); k++){
-                            //System.out.println(emfVariableDeclaration.getInitializer().get(j).getVariableList().getVariable().get(k).getName());
-                            inputVariables.add(emfVariableDeclaration.getInitializer().get(j).getVariableList().getVariable().get(k));
-                        }
-                    }
-                }
+            for(int i = 0; i < emfFuncDecl.getVariable().size(); i++){
+                if(emfFuncDecl.getVariable().get(i).getVariableList().getInitializer().getDeclaration().getSection() == VariableSection.VAR_INPUT)
+                inputVariables.add(emfFuncDecl.getVariable().get(i));
             }
 
             if(funParam.size() == inputVariables.size()){
                 for(int i = 0; i < funParam.size(); i++){
                     for(int j = 0; j < inputVariables.size(); j++){
-                        if(funParam.get(i).getName() == inputVariables.get(j).getName()){
-                            break;
-                        }
-                        else{ }
+                        if(funParam.get(i).getName().equals(inputVariables.get(j).getName())) break;
                         if(j == (inputVariables.size()-1)){
-                            System.err.println("[ input parameter does not match in " + ctx.getText() + " ]");
+                            System.err.println(" [ Error: parameters does not match definition in function '" + ctx.getText() + "' ]");
                             System.exit(0);
                         }
-                        else{ }
                     }
                 }
                 for(int i = 0; i < inputVariables.size(); i++){
                     for(int j = 0; j < funParam.size(); j++){
-                        if(inputVariables.get(i).getName() == funParam.get(j).getName()){
-                            break;
-                        }
-                        else{ }
+                        if(inputVariables.get(i).getName().equals(funParam.get(j).getName())) break;
                         if(j == (funParam.size()-1)){
-                            System.err.println("[ input parameter does not match in " + ctx.getText() + " ]");
+                            System.err.println(" [ Error: parameters does not match definition in function '" + ctx.getText() + "' ]");
                             System.exit(0);
                         }
-                        else{ }
                     }
                 }
             }
             else{
-                if(inputVariables.size() == 0){
-                    System.err.println("[ defined element type error in FUNCTION '" + emfFunction.getName() + "' ]");
-                    System.exit(0);
-                }
-                else{ 
-                    System.err.println("[ parameter does not match in " + ctx.getText() + " ]");
-                    System.exit(0);
-                }
+                System.err.println(" [ Error: parameters does not match definition in function '" + ctx.getText() + "' ]");
+                System.exit(0);
             }
+
+
         } catch(Exception exception){
             System.err.println("Error in ModelCheck Func_call!!!");
         }
