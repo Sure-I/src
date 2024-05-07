@@ -1,4 +1,4 @@
-// Generated from ST.g4 by ANTLR 4.13.1
+// Generated from .//ST.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -326,16 +326,6 @@ public interface STListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitStatements(STParser.StatementsContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link STParser#stmt_list}.
-	 * @param ctx the parse tree
-	 */
-	void enterStmt_list(STParser.Stmt_listContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#stmt_list}.
-	 * @param ctx the parse tree
-	 */
-	void exitStmt_list(STParser.Stmt_listContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link STParser#stmt}.
 	 * @param ctx the parse tree

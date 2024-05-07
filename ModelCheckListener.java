@@ -5,6 +5,7 @@
 //////再通过walker进行一次遍历，该类中对于每个节点的enter()和eixt()方法对的重载为校验功能
 
 /////////////已编写规则条目如下，<>规则写在GenModelListener中，[]规则写在ModelCheckListener中
+//////*<作用域错误> 于GenModelListener的enterRuleContext*/
 //////*<使用未声明变量> 于exitVariable_name*/
 //////*<新声明变量名已存在> 于exitVariable_name*/
 //////*<使用未声明自定义类型> 于exitType_name*/
@@ -18,8 +19,8 @@
 //////*[常量值超过数据类型范围]*/
 //////*[expression操作数类型不匹配] 于exitExpression*/
 //////*[赋值语句中变量与表达式类型不匹配]  于exitAssign_stmt*/
-//////*[enum类型变量赋值不在定义中] 于exitQuote_value  存在问题，value值相同，却判断为不同   ==号存在问题，用equals()解决*/
-//////*[enum类型变量初始化问题] 于exitEnum_spec_init  存在问题同上*/
+//////*[enum类型变量赋值不在定义中] 于exitQuote_value */
+//////*[enum类型变量初始化问题] 于exitEnum_spec_init  */
 //////*[数组的初始化，分配值与数组大小不符合] */
 //////*[数组访问下标超过数组大小] */
 //////*[不是数组的数据类型用 '[]' 索引] */
@@ -81,11 +82,10 @@ public class ModelCheckListener extends STBaseListener{
     //从genModelListener中提出的HaspMap存放在下列属性中
     public Map<ParseTree, EObject> mapEmf = new HashMap<>();
     public Map<ParseTree, String> mapNodeStr = new HashMap<>();
-    public Map<String, EObject> mapVarEmf = new HashMap<>();
     public Map<String, EObject> mapTypeEmf = new HashMap<>();
-    public Map<String, EObject> mapFunEmf = new HashMap<>();
-    public Map<String, EObject> mapMethodEmf = new HashMap<>();
-    public Map<String, EObject> mapFBEmf = new HashMap<>();
+    public Map<String, EObject> mapGlobalVarEmf = new HashMap<>();
+    public Map<String, EObject> mapGlobalFunEmf = new HashMap<>();
+    public Map<String, EObject> mapGlobalFBEmf = new HashMap<>();
 
     //////getEmf()方法，获取节点自身的emf并返回该对象
     private EObject getEmf(ParserRuleContext ctx){
