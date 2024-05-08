@@ -27,7 +27,7 @@ public class MainApplication {
         STParser parser = new STParser(tokens);
         tree = parser.program();
        
-
+        try{
             ParseTreeWalker myWalker = new ParseTreeWalker();
             //首次遍历AST进行EMF模型实例化
             GenModelListener genModelListener = new GenModelListener();
@@ -49,7 +49,9 @@ public class MainApplication {
             modelCheckListener.mapGlobalFunEmf = mapGlobalFunEmf;
             modelCheckListener.mapGlobalFBEmf = mapGlobalFBEmf;
             myWalker.walk(modelCheckListener, tree);
-
+        } catch(Exception exception){
+            System.err.println("Error In MainApplication!!!");
+        }
 
     }
 }

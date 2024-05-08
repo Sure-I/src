@@ -1177,16 +1177,6 @@ public interface STListener extends ParseTreeListener {
 	 */
 	void exitVariable_name(STParser.Variable_nameContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link STParser#multi_elem_var}.
-	 * @param ctx the parse tree
-	 */
-	void enterMulti_elem_var(STParser.Multi_elem_varContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#multi_elem_var}.
-	 * @param ctx the parse tree
-	 */
-	void exitMulti_elem_var(STParser.Multi_elem_varContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link STParser#subscript_list}.
 	 * @param ctx the parse tree
 	 */
@@ -1206,36 +1196,6 @@ public interface STListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitSubscript(STParser.SubscriptContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link STParser#struct_variable}.
-	 * @param ctx the parse tree
-	 */
-	void enterStruct_variable(STParser.Struct_variableContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#struct_variable}.
-	 * @param ctx the parse tree
-	 */
-	void exitStruct_variable(STParser.Struct_variableContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link STParser#struct_elem_select}.
-	 * @param ctx the parse tree
-	 */
-	void enterStruct_elem_select(STParser.Struct_elem_selectContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#struct_elem_select}.
-	 * @param ctx the parse tree
-	 */
-	void exitStruct_elem_select(STParser.Struct_elem_selectContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link STParser#var_access}.
-	 * @param ctx the parse tree
-	 */
-	void enterVar_access(STParser.Var_accessContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#var_access}.
-	 * @param ctx the parse tree
-	 */
-	void exitVar_access(STParser.Var_accessContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link STParser#symbolic_variable}.
 	 * @param ctx the parse tree
