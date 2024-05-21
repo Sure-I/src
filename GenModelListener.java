@@ -203,6 +203,30 @@ public class GenModelListener extends STBaseListener{
 
     @Override public void exitProgram(STParser.ProgramContext ctx) { } */
 
+    @Override public void enterAll_decl(STParser.All_declContext ctx) { }
+
+	@Override public void exitAll_decl(STParser.All_declContext ctx) { 
+        try{
+            AllDeclaration emf = declFactory.createAllDeclaration();
+            mapEmf.put(ctx, emf);
+            for(int i = 0; i < ctx.getChildCount(); i++){
+                String childNodeStr = mapNodeStr.get(ctx.getChild(i));
+                if(childNodeStr.equals("data_type_decl")){
+                    TypeDeclList typeDeclListEmf = (TypeDeclList)mapEmf.get(ctx.getChild(i));
+                    for(int j = 0; j < typeDeclListEmf.getTypeDeclatation().size(); j++){
+                        emf.getDeclaration().add(typeDeclListEmf.getTypeDeclatation().get(j));
+                    }
+                }
+                else{
+                    emf.getDeclaration().add((Declaration)mapEmf.get(ctx.getChild(i)));
+                }
+            }
+            System.out.println(emf.getDeclaration().size());
+        }catch(Exception exception){
+            System.err.println("Error in exitAll_decl!!!");
+        }
+    }
+
 /* ///以下部分为所有的节点的用户操作
 //////整体逻辑为
 //////在enter()方法进入节点时，实例化对应的EMF模型对象存储至HashMap中
