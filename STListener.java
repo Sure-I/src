@@ -1187,16 +1187,6 @@ public interface STListener extends ParseTreeListener {
 	 */
 	void exitSubscript_list(STParser.Subscript_listContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link STParser#subscript}.
-	 * @param ctx the parse tree
-	 */
-	void enterSubscript(STParser.SubscriptContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#subscript}.
-	 * @param ctx the parse tree
-	 */
-	void exitSubscript(STParser.SubscriptContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link STParser#symbolic_variable}.
 	 * @param ctx the parse tree
 	 */
