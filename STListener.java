@@ -1,4 +1,4 @@
-// Generated from .//ST.g4 by ANTLR 4.13.1
+// Generated from ST.g4 by ANTLR 4.13.1
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -147,16 +147,6 @@ public interface STListener extends ParseTreeListener {
 	 */
 	void exitFunc_call(STParser.Func_callContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link STParser#func_access}.
-	 * @param ctx the parse tree
-	 */
-	void enterFunc_access(STParser.Func_accessContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#func_access}.
-	 * @param ctx the parse tree
-	 */
-	void exitFunc_access(STParser.Func_accessContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link STParser#fb_decl}.
 	 * @param ctx the parse tree
 	 */
@@ -196,6 +186,16 @@ public interface STListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitDerived_fb_name(STParser.Derived_fb_nameContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link STParser#fb_elem_name}.
+	 * @param ctx the parse tree
+	 */
+	void enterFb_elem_name(STParser.Fb_elem_nameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link STParser#fb_elem_name}.
+	 * @param ctx the parse tree
+	 */
+	void exitFb_elem_name(STParser.Fb_elem_nameContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link STParser#fb_instance_name}.
 	 * @param ctx the parse tree
@@ -326,16 +326,6 @@ public interface STListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitStatements(STParser.StatementsContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link STParser#stmt_list}.
-	 * @param ctx the parse tree
-	 */
-	void enterStmt_list(STParser.Stmt_listContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#stmt_list}.
-	 * @param ctx the parse tree
-	 */
-	void exitStmt_list(STParser.Stmt_listContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link STParser#stmt}.
 	 * @param ctx the parse tree
@@ -937,6 +927,16 @@ public interface STListener extends ParseTreeListener {
 	 */
 	void exitStruct_elem_name(STParser.Struct_elem_nameContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link STParser#struct_elem_access}.
+	 * @param ctx the parse tree
+	 */
+	void enterStruct_elem_access(STParser.Struct_elem_accessContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link STParser#struct_elem_access}.
+	 * @param ctx the parse tree
+	 */
+	void exitStruct_elem_access(STParser.Struct_elem_accessContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link STParser#str_type_decl}.
 	 * @param ctx the parse tree
 	 */
@@ -1127,66 +1127,6 @@ public interface STListener extends ParseTreeListener {
 	 */
 	void exitVar_access_decls(STParser.Var_access_declsContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link STParser#var_local_decls}.
-	 * @param ctx the parse tree
-	 */
-	void enterVar_local_decls(STParser.Var_local_declsContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#var_local_decls}.
-	 * @param ctx the parse tree
-	 */
-	void exitVar_local_decls(STParser.Var_local_declsContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link STParser#loc_var_decl}.
-	 * @param ctx the parse tree
-	 */
-	void enterLoc_var_decl(STParser.Loc_var_declContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#loc_var_decl}.
-	 * @param ctx the parse tree
-	 */
-	void exitLoc_var_decl(STParser.Loc_var_declContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link STParser#loc_var_spec_init}.
-	 * @param ctx the parse tree
-	 */
-	void enterLoc_var_spec_init(STParser.Loc_var_spec_initContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#loc_var_spec_init}.
-	 * @param ctx the parse tree
-	 */
-	void exitLoc_var_spec_init(STParser.Loc_var_spec_initContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link STParser#var_local_partly_decl}.
-	 * @param ctx the parse tree
-	 */
-	void enterVar_local_partly_decl(STParser.Var_local_partly_declContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#var_local_partly_decl}.
-	 * @param ctx the parse tree
-	 */
-	void exitVar_local_partly_decl(STParser.Var_local_partly_declContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link STParser#loc_partly_var}.
-	 * @param ctx the parse tree
-	 */
-	void enterLoc_partly_var(STParser.Loc_partly_varContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#loc_partly_var}.
-	 * @param ctx the parse tree
-	 */
-	void exitLoc_partly_var(STParser.Loc_partly_varContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link STParser#var_spec}.
-	 * @param ctx the parse tree
-	 */
-	void enterVar_spec(STParser.Var_specContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#var_spec}.
-	 * @param ctx the parse tree
-	 */
-	void exitVar_spec(STParser.Var_specContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link STParser#decl_common_part}.
 	 * @param ctx the parse tree
 	 */
@@ -1237,16 +1177,6 @@ public interface STListener extends ParseTreeListener {
 	 */
 	void exitVariable_name(STParser.Variable_nameContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link STParser#multi_elem_var}.
-	 * @param ctx the parse tree
-	 */
-	void enterMulti_elem_var(STParser.Multi_elem_varContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#multi_elem_var}.
-	 * @param ctx the parse tree
-	 */
-	void exitMulti_elem_var(STParser.Multi_elem_varContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link STParser#subscript_list}.
 	 * @param ctx the parse tree
 	 */
@@ -1266,36 +1196,6 @@ public interface STListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitSubscript(STParser.SubscriptContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link STParser#struct_variable}.
-	 * @param ctx the parse tree
-	 */
-	void enterStruct_variable(STParser.Struct_variableContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#struct_variable}.
-	 * @param ctx the parse tree
-	 */
-	void exitStruct_variable(STParser.Struct_variableContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link STParser#struct_elem_select}.
-	 * @param ctx the parse tree
-	 */
-	void enterStruct_elem_select(STParser.Struct_elem_selectContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#struct_elem_select}.
-	 * @param ctx the parse tree
-	 */
-	void exitStruct_elem_select(STParser.Struct_elem_selectContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link STParser#var_access}.
-	 * @param ctx the parse tree
-	 */
-	void enterVar_access(STParser.Var_accessContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link STParser#var_access}.
-	 * @param ctx the parse tree
-	 */
-	void exitVar_access(STParser.Var_accessContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link STParser#symbolic_variable}.
 	 * @param ctx the parse tree

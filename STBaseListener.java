@@ -1,4 +1,4 @@
-// Generated from .//ST.g4 by ANTLR 4.13.1
+// Generated from ST.g4 by ANTLR 4.13.1
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -184,18 +184,6 @@ public class STBaseListener implements STListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterFunc_access(STParser.Func_accessContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitFunc_access(STParser.Func_accessContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterFb_decl(STParser.Fb_declContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -239,6 +227,18 @@ public class STBaseListener implements STListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitDerived_fb_name(STParser.Derived_fb_nameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterFb_elem_name(STParser.Fb_elem_nameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFb_elem_name(STParser.Fb_elem_nameContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -395,18 +395,6 @@ public class STBaseListener implements STListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitStatements(STParser.StatementsContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterStmt_list(STParser.Stmt_listContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitStmt_list(STParser.Stmt_listContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -1132,6 +1120,18 @@ public class STBaseListener implements STListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterStruct_elem_access(STParser.Struct_elem_accessContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitStruct_elem_access(STParser.Struct_elem_accessContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterStr_type_decl(STParser.Str_type_declContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -1360,78 +1360,6 @@ public class STBaseListener implements STListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterVar_local_decls(STParser.Var_local_declsContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitVar_local_decls(STParser.Var_local_declsContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterLoc_var_decl(STParser.Loc_var_declContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitLoc_var_decl(STParser.Loc_var_declContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterLoc_var_spec_init(STParser.Loc_var_spec_initContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitLoc_var_spec_init(STParser.Loc_var_spec_initContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterVar_local_partly_decl(STParser.Var_local_partly_declContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitVar_local_partly_decl(STParser.Var_local_partly_declContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterLoc_partly_var(STParser.Loc_partly_varContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitLoc_partly_var(STParser.Loc_partly_varContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterVar_spec(STParser.Var_specContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitVar_spec(STParser.Var_specContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterDecl_common_part(STParser.Decl_common_partContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -1492,18 +1420,6 @@ public class STBaseListener implements STListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterMulti_elem_var(STParser.Multi_elem_varContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitMulti_elem_var(STParser.Multi_elem_varContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterSubscript_list(STParser.Subscript_listContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -1523,42 +1439,6 @@ public class STBaseListener implements STListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitSubscript(STParser.SubscriptContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterStruct_variable(STParser.Struct_variableContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitStruct_variable(STParser.Struct_variableContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterStruct_elem_select(STParser.Struct_elem_selectContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitStruct_elem_select(STParser.Struct_elem_selectContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterVar_access(STParser.Var_accessContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitVar_access(STParser.Var_accessContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
