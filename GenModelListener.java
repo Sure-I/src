@@ -252,199 +252,203 @@ public class GenModelListener extends STBaseListener{
     }
 
 	@Override public void exitExpression(STParser.ExpressionContext ctx) { 
-        ParseTree childNode = ctx.getChild(0);
-        Namespace namespaceEmf = (Namespace)getEmf(ctx);
+        try{
+            ParseTree childNode = ctx.getChild(0);
+            Namespace namespaceEmf = (Namespace)getEmf(ctx);
 
-        if(childNode instanceof ErrorNode){ 
+            if(childNode instanceof ErrorNode){ 
 
-        }
-        else if(childNode instanceof TerminalNode){
-            TerminalNode tNode = (TerminalNode)childNode;
-            UnaryExpression emf = exprFactory.createUnaryExpression();
-            emf.setNamespace(namespaceEmf);
-            mapEmf.put(ctx, emf);
-            emf.setTestString("unary_expr_emf");
-
-            emf.setExpression( (Expression)getChildEmf(ctx, 1) );
-            emf.setType(emf.getExpression().getType());
-            String nodeStr = mapNodeStr.get(tNode);
-            switch(nodeStr){
-                case "(":
-                    //System.out.println("PARETHESES");
-                    emf.setOperator(UnaryOperator.PARENTHESES);
-                    break;
-                case "^":
-                    emf.setOperator(UnaryOperator.DEREFERENCE);
-                    break;
-                case "-":
-                    emf.setOperator(UnaryOperator.NEGATION);
-                    break;
-                case "+":
-                    emf.setOperator(UnaryOperator.UNRAYPLUS);
-                    break;
-                case "NOT":
-                    emf.setOperator(UnaryOperator.COMPLEMENT);
-                    break;
-                default: //System.out.println("expression error!!!");
             }
-        }
-        else if( mapNodeStr.get(ctx.getChild(0)) == "expression" ){
-            BinaryExpression emf = exprFactory.createBinaryExpression();
-            emf.setNamespace(namespaceEmf);
-            mapEmf.put(ctx, emf);
+            else if(childNode instanceof TerminalNode){
+                TerminalNode tNode = (TerminalNode)childNode;
+                UnaryExpression emf = exprFactory.createUnaryExpression();
+                emf.setNamespace(namespaceEmf);
+                mapEmf.put(ctx, emf);
+                emf.setTestString("unary_expr_emf");
 
-            emf.setTestString("binary_expr_emf");
-            emf.setFirstExpression( (Expression)getChildEmf(ctx, 0) );
-            emf.setSecondExpression( (Expression)getChildEmf(ctx, 2) );
-            emf.setType(emf.getFirstExpression().getType());
-
-            String nodeStr = mapNodeStr.get(ctx.getChild(1));
-            switch(nodeStr){
-                case "**":
-                    emf.setOperator(BinaryOperator.EXPONENTIATION);
-                    break;
-                case "*":
-                    emf.setOperator(BinaryOperator.MULTIPLY);
-                    break;
-                case "/":
-                    emf.setOperator(BinaryOperator.DIVIDE);
-                    break;
-                case "MOD":
-                    emf.setOperator(BinaryOperator.MODULO);
-                    break;
-                case "+":
-                    emf.setOperator(BinaryOperator.ADD);
-                    break;
-                case "-":
-                    emf.setOperator(BinaryOperator.SUBSTRACT);
-                    break;
-                case "=":
-                    emf.setOperator(BinaryOperator.EQUAL);
-                    break;
-                case "<>":
-                    emf.setOperator(BinaryOperator.INEQUAL);
-                    break;
-                case "<":
-                    emf.setOperator(BinaryOperator.LESS_THAN);
-                    break;
-                case "<=":
-                    emf.setOperator(BinaryOperator.LESS_THAN_OR_EQUAL);
-                    break;
-                case ">":
-                    emf.setOperator(BinaryOperator.GREATER_THAN);
-                    break;
-                case ">=":
-                    emf.setOperator(BinaryOperator.GTEATER_THAN_OR_EQUAL);
-                    break;
-                case "&":
-                    emf.setOperator(BinaryOperator.BOOLEAN_AND);
-                    break;
-                case "AND":
-                    emf.setOperator(BinaryOperator.BOOLEAN_AND);
-                    break;
-                case "XOR":
-                    emf.setOperator(BinaryOperator.BOOLEAN_EXCLUSIVE_OR);
-                    break;
-                case "OR":
-                    emf.setOperator(BinaryOperator.BOOLEAN_OR);
-                    break;
-                default: //System.out.println("expression error!!!");
-            }
-
-        }
-        else if( mapNodeStr.get(ctx.getChild(0)) == "constant" ){
-            LiteralExpression emf = exprFactory.createLiteralExpression();
-            emf.setNamespace(namespaceEmf);
-            mapEmf.put(ctx, emf);
-            emf.setTestString("constant_expr_emf");
-            emf.setLiteral( (Literal)getChildEmf(ctx, 0) );
-            //System.out.println(ctx.getText() + ": " + emf.getLiteral().getType().getLiteral());
-            if(emf.getLiteral().getType() == LiteralType.INTEGER){
-                if(mapTypeEmf.get("INTEGER") == null){
-                    TypeDeclaration typeDeclEmf = declFactory.createTypeDeclaration();
-                    UserDefinedDataType typeEmf = typeFactory.createUserDefinedDataType();
-                    typeDeclEmf.setType(typeEmf);
-                    typeEmf.setTypeDeclaration(typeDeclEmf);
-                    typeEmf.setName("INTEGER");
-                    mapTypeEmf.put("INTEGER", typeEmf);
-                    emf.setType(typeEmf);
+                emf.setExpression( (Expression)getChildEmf(ctx, 1) );
+                emf.setType(emf.getExpression().getType());
+                String nodeStr = mapNodeStr.get(tNode);
+                switch(nodeStr){
+                    case "(":
+                        //System.out.println("PARETHESES");
+                        emf.setOperator(UnaryOperator.PARENTHESES);
+                        break;
+                    case "^":
+                        emf.setOperator(UnaryOperator.DEREFERENCE);
+                        break;
+                    case "-":
+                        emf.setOperator(UnaryOperator.NEGATION);
+                        break;
+                    case "+":
+                        emf.setOperator(UnaryOperator.UNRAYPLUS);
+                        break;
+                    case "NOT":
+                        emf.setOperator(UnaryOperator.COMPLEMENT);
+                        break;
+                    default: //System.out.println("expression error!!!");
                 }
-                else{emf.setType((Type)mapTypeEmf.get("INTEGER"));}
             }
-            else if(emf.getLiteral().getType() == LiteralType.SINGLE_BYTE_CHAR){
-                if(mapTypeEmf.get("SINGLE_BYTE_CHAR") == null){
-                    TypeDeclaration typeDeclEmf = declFactory.createTypeDeclaration();
-                    UserDefinedDataType typeEmf = typeFactory.createUserDefinedDataType();
-                    typeDeclEmf.setType(typeEmf);
-                    typeEmf.setTypeDeclaration(typeDeclEmf);
-                    typeEmf.setName("SINGLE_BYTE_CHAR");
-                    mapTypeEmf.put("SINGLE_BYTE_CHAR", typeEmf);
-                    emf.setType(typeEmf);
-                }
-                else{emf.setType((Type)mapTypeEmf.get("SINGLE_BYTE_CHAR"));}
-            }
-            else if(emf.getLiteral().getType() == LiteralType.REAL){
-                if(mapTypeEmf.get("REAL") == null){
-                    TypeDeclaration typeDeclEmf = declFactory.createTypeDeclaration();
-                    UserDefinedDataType typeEmf = typeFactory.createUserDefinedDataType();
-                    typeDeclEmf.setType(typeEmf);
-                    typeEmf.setTypeDeclaration(typeDeclEmf);
-                    typeEmf.setName("REAL");
-                    mapTypeEmf.put("REAL", typeEmf);
-                    emf.setType(typeEmf);
-                }
-                else{emf.setType((Type)mapTypeEmf.get("REAL"));}
-            }
-            else if(emf.getLiteral().getType() == LiteralType.BOOLEAN){
-                if(mapTypeEmf.get("BOOLEAN") == null){
-                    TypeDeclaration typeDeclEmf = declFactory.createTypeDeclaration();
-                    UserDefinedDataType typeEmf = typeFactory.createUserDefinedDataType();
-                    typeDeclEmf.setType(typeEmf);
-                    typeEmf.setTypeDeclaration(typeDeclEmf);
-                    typeEmf.setName("BOOLEAN");
-                    mapTypeEmf.put("BOOLEAN", typeEmf);
-                    emf.setType(typeEmf);
-                }
-                else{emf.setType((Type)mapTypeEmf.get("BOOLEAN"));}
-            }
-            else if(emf.getLiteral().getType() == LiteralType.TIME){
-                if(mapTypeEmf.get("TIME") == null){
-                    TypeDeclaration typeDeclEmf = declFactory.createTypeDeclaration();
-                    UserDefinedDataType typeEmf = typeFactory.createUserDefinedDataType();
-                    typeDeclEmf.setType(typeEmf);
-                    typeEmf.setTypeDeclaration(typeDeclEmf);
-                    typeEmf.setName("TIME");
-                    mapTypeEmf.put("TIME", typeEmf);
-                    emf.setType(typeEmf);
-                }
-                else{emf.setType((Type)mapTypeEmf.get("TIME"));}
-            }
-            else{}
-        }
-        else if( mapNodeStr.get(ctx.getChild(0)) == "variable" ){
-            VariableExpression emf = exprFactory.createVariableExpression();
-            emf.setNamespace(namespaceEmf);
-            mapEmf.put(ctx, emf);
-            emf.setVariable((Variable)getChildEmf(ctx, 0));
-            emf.setType(emf.getVariable().getType());
+            else if( mapNodeStr.get(ctx.getChild(0)) == "expression" ){
+                BinaryExpression emf = exprFactory.createBinaryExpression();
+                emf.setNamespace(namespaceEmf);
+                mapEmf.put(ctx, emf);
 
-            emf.setTestString("var_access_expr_emf");
+                emf.setTestString("binary_expr_emf");
+                emf.setFirstExpression( (Expression)getChildEmf(ctx, 0) );
+                emf.setSecondExpression( (Expression)getChildEmf(ctx, 2) );
+                emf.setType(emf.getFirstExpression().getType());
+
+                String nodeStr = mapNodeStr.get(ctx.getChild(1));
+                switch(nodeStr){
+                    case "**":
+                        emf.setOperator(BinaryOperator.EXPONENTIATION);
+                        break;
+                    case "*":
+                        emf.setOperator(BinaryOperator.MULTIPLY);
+                        break;
+                    case "/":
+                        emf.setOperator(BinaryOperator.DIVIDE);
+                        break;
+                    case "MOD":
+                        emf.setOperator(BinaryOperator.MODULO);
+                        break;
+                    case "+":
+                        emf.setOperator(BinaryOperator.ADD);
+                        break;
+                    case "-":
+                        emf.setOperator(BinaryOperator.SUBSTRACT);
+                        break;
+                    case "=":
+                        emf.setOperator(BinaryOperator.EQUAL);
+                        break;
+                    case "<>":
+                        emf.setOperator(BinaryOperator.INEQUAL);
+                        break;
+                    case "<":
+                        emf.setOperator(BinaryOperator.LESS_THAN);
+                        break;
+                    case "<=":
+                        emf.setOperator(BinaryOperator.LESS_THAN_OR_EQUAL);
+                        break;
+                    case ">":
+                        emf.setOperator(BinaryOperator.GREATER_THAN);
+                        break;
+                    case ">=":
+                        emf.setOperator(BinaryOperator.GTEATER_THAN_OR_EQUAL);
+                        break;
+                    case "&":
+                        emf.setOperator(BinaryOperator.BOOLEAN_AND);
+                        break;
+                    case "AND":
+                        emf.setOperator(BinaryOperator.BOOLEAN_AND);
+                        break;
+                    case "XOR":
+                        emf.setOperator(BinaryOperator.BOOLEAN_EXCLUSIVE_OR);
+                        break;
+                    case "OR":
+                        emf.setOperator(BinaryOperator.BOOLEAN_OR);
+                        break;
+                    default: //System.out.println("expression error!!!");
+                }
+
+            }
+            else if( mapNodeStr.get(ctx.getChild(0)) == "constant" ){
+                LiteralExpression emf = exprFactory.createLiteralExpression();
+                emf.setNamespace(namespaceEmf);
+                mapEmf.put(ctx, emf);
+                emf.setTestString("constant_expr_emf");
+                emf.setLiteral( (Literal)getChildEmf(ctx, 0) );
+                //System.out.println(ctx.getText() + ": " + emf.getLiteral().getType().getLiteral());
+                if(emf.getLiteral().getType() == LiteralType.INTEGER){
+                    if(mapTypeEmf.get("INTEGER") == null){
+                        TypeDeclaration typeDeclEmf = declFactory.createTypeDeclaration();
+                        UserDefinedDataType typeEmf = typeFactory.createUserDefinedDataType();
+                        typeDeclEmf.setType(typeEmf);
+                        typeEmf.setTypeDeclaration(typeDeclEmf);
+                        typeEmf.setName("INTEGER");
+                        mapTypeEmf.put("INTEGER", typeEmf);
+                        emf.setType(typeEmf);
+                    }
+                    else{emf.setType((Type)mapTypeEmf.get("INTEGER"));}
+                }
+                else if(emf.getLiteral().getType() == LiteralType.SINGLE_BYTE_CHAR){
+                    if(mapTypeEmf.get("SINGLE_BYTE_CHAR") == null){
+                        TypeDeclaration typeDeclEmf = declFactory.createTypeDeclaration();
+                        UserDefinedDataType typeEmf = typeFactory.createUserDefinedDataType();
+                        typeDeclEmf.setType(typeEmf);
+                        typeEmf.setTypeDeclaration(typeDeclEmf);
+                        typeEmf.setName("SINGLE_BYTE_CHAR");
+                        mapTypeEmf.put("SINGLE_BYTE_CHAR", typeEmf);
+                        emf.setType(typeEmf);
+                    }
+                    else{emf.setType((Type)mapTypeEmf.get("SINGLE_BYTE_CHAR"));}
+                }
+                else if(emf.getLiteral().getType() == LiteralType.REAL){
+                    if(mapTypeEmf.get("REAL") == null){
+                        TypeDeclaration typeDeclEmf = declFactory.createTypeDeclaration();
+                        UserDefinedDataType typeEmf = typeFactory.createUserDefinedDataType();
+                        typeDeclEmf.setType(typeEmf);
+                        typeEmf.setTypeDeclaration(typeDeclEmf);
+                        typeEmf.setName("REAL");
+                        mapTypeEmf.put("REAL", typeEmf);
+                        emf.setType(typeEmf);
+                    }
+                    else{emf.setType((Type)mapTypeEmf.get("REAL"));}
+                }
+                else if(emf.getLiteral().getType() == LiteralType.BOOLEAN){
+                    if(mapTypeEmf.get("BOOLEAN") == null){
+                        TypeDeclaration typeDeclEmf = declFactory.createTypeDeclaration();
+                        UserDefinedDataType typeEmf = typeFactory.createUserDefinedDataType();
+                        typeDeclEmf.setType(typeEmf);
+                        typeEmf.setTypeDeclaration(typeDeclEmf);
+                        typeEmf.setName("BOOLEAN");
+                        mapTypeEmf.put("BOOLEAN", typeEmf);
+                        emf.setType(typeEmf);
+                    }
+                    else{emf.setType((Type)mapTypeEmf.get("BOOLEAN"));}
+                }
+                else if(emf.getLiteral().getType() == LiteralType.TIME){
+                    if(mapTypeEmf.get("TIME") == null){
+                        TypeDeclaration typeDeclEmf = declFactory.createTypeDeclaration();
+                        UserDefinedDataType typeEmf = typeFactory.createUserDefinedDataType();
+                        typeDeclEmf.setType(typeEmf);
+                        typeEmf.setTypeDeclaration(typeDeclEmf);
+                        typeEmf.setName("TIME");
+                        mapTypeEmf.put("TIME", typeEmf);
+                        emf.setType(typeEmf);
+                    }
+                    else{emf.setType((Type)mapTypeEmf.get("TIME"));}
+                }
+                else{}
+            }
+            else if( mapNodeStr.get(ctx.getChild(0)) == "variable" ){
+                VariableExpression emf = exprFactory.createVariableExpression();
+                emf.setNamespace(namespaceEmf);
+                mapEmf.put(ctx, emf);
+                emf.setVariable((Variable)getChildEmf(ctx, 0));
+                emf.setType(emf.getVariable().getType());
+
+                emf.setTestString("var_access_expr_emf");
+            }
+            else if( mapNodeStr.get(ctx.getChild(0)) == "func_call" ){
+                setFromChildEmf(ctx, 0);
+                FunctionCall emf = (FunctionCall)getEmf(ctx);
+                emf.setNamespace(namespaceEmf);
+                emf.setTestString("func_call_expr_emf");
+            }
+            else if( mapNodeStr.get(ctx.getChild(0)) == "quote_value" ){ 
+                QuotevalueExpression emf = exprFactory.createQuotevalueExpression();
+                emf.setNamespace(namespaceEmf);
+                mapEmf.put(ctx, emf);
+                QuoteValue valueEmf = (QuoteValue)mapEmf.get(ctx.getChild(0));
+                emf.setQuoteValue(valueEmf);
+                emf.setType(valueEmf.getQuoteType());
+            }
+            else{ }
+        } catch(Exception exception){
+            System.err.println("Error In exitExpression!!!");
         }
-        else if( mapNodeStr.get(ctx.getChild(0)) == "func_call" ){
-            setFromChildEmf(ctx, 0);
-            FunctionCall emf = (FunctionCall)getEmf(ctx);
-            emf.setNamespace(namespaceEmf);
-            emf.setTestString("func_call_expr_emf");
-        }
-        else if( mapNodeStr.get(ctx.getChild(0)) == "quote_value" ){ 
-            QuotevalueExpression emf = exprFactory.createQuotevalueExpression();
-            emf.setNamespace(namespaceEmf);
-            mapEmf.put(ctx, emf);
-            QuoteValue valueEmf = (QuoteValue)mapEmf.get(ctx.getChild(0));
-            emf.setQuoteValue(valueEmf);
-            emf.setType(valueEmf.getQuoteType());
-        }
-        else{ }
     }
 
 /* /////////////////////////////////////////////////////////////////////////
@@ -673,37 +677,41 @@ public class GenModelListener extends STBaseListener{
     }
 
 	@Override public void exitAssign_stmt(STParser.Assign_stmtContext ctx) { 
-        String childNodeStr = mapNodeStr.get(ctx.getChild(0));
-        switch(childNodeStr){
-            case "variable": 
-                AssignmentStatement emf0 = stmtFactory.createAssignmentStatement();
-                Namespace namespaceEmf = (Namespace)getEmf(ctx);
-                emf0.setNamespace(namespaceEmf);
-                emf0.setTestString("assign_stmt_emf");
-                mapEmf.put(ctx, emf0);
-                for(int i = 0; i < ctx.getChildCount(); i++){
-                    EObject childEmf = getChildEmf(ctx, i);
-                    if(childEmf instanceof Variable){
-                        Variable childEmf0 = (Variable)childEmf;
-                        emf0.setVariable(childEmf0);
+        try{
+            String childNodeStr = mapNodeStr.get(ctx.getChild(0));
+            switch(childNodeStr){
+                case "variable": 
+                    AssignmentStatement emf0 = stmtFactory.createAssignmentStatement();
+                    Namespace namespaceEmf = (Namespace)getEmf(ctx);
+                    emf0.setNamespace(namespaceEmf);
+                    emf0.setTestString("assign_stmt_emf");
+                    mapEmf.put(ctx, emf0);
+                    for(int i = 0; i < ctx.getChildCount(); i++){
+                        EObject childEmf = getChildEmf(ctx, i);
+                        if(childEmf instanceof Variable){
+                            Variable childEmf0 = (Variable)childEmf;
+                            emf0.setVariable(childEmf0);
+                        }
+                        else if(childEmf instanceof Expression){
+                            Expression childEmf1 = (Expression)childEmf;
+                            emf0.setExpression(childEmf1);
+                        }
+                        else if(childEmf instanceof QuoteValue){
+                            QuoteValue childEmf1 = (QuoteValue)childEmf;
+                            emf0.setQuoteValue(childEmf1);
+                        }
+                        else{ }
                     }
-                    else if(childEmf instanceof Expression){
-                        Expression childEmf1 = (Expression)childEmf;
-                        emf0.setExpression(childEmf1);
-                    }
-                    else if(childEmf instanceof QuoteValue){
-                        QuoteValue childEmf1 = (QuoteValue)childEmf;
-                        emf0.setQuoteValue(childEmf1);
-                    }
-                    else{ }
-                }
-                break;
-            case "ref_assign": 
+                    break;
+                case "ref_assign": 
 
-                break;
-            case "assignment_attempt": 
+                    break;
+                case "assignment_attempt": 
 
-                break;
+                    break;
+            }
+        } catch(Exception exception){
+            System.err.println("Error In exitAssign_stmt!!!");
         }
     }
 
@@ -2093,7 +2101,27 @@ public class GenModelListener extends STBaseListener{
         try{
             ParseTree childNode = ctx.getChild(0);
             String childNodeStr = mapNodeStr.get(childNode);
-            if(childNodeStr.equals("symbloic_variable")){ }
+            if(childNodeStr.equals("symbolic_variable")){ 
+                SubscriptVariable emf = varFactory.createSubscriptVariable();
+                mapEmf.put(ctx, emf);
+                for(int i = 0; i < ctx.getChildCount(); i++){
+                    childNodeStr = mapNodeStr.get(ctx.getChild(i));
+                    if(childNodeStr.equals("symbolic_variable")){
+                        emf.setVariable((Variable)mapEmf.get(ctx.getChild(i)));
+                    }
+                    else if(childNodeStr.equals("subscript_list")){
+                        emf.setSubscript((SubscriptList)mapEmf.get(ctx.getChild(i)));
+                    }
+                }
+                Variable varEmf = emf.getVariable();
+                emf.setName(varEmf.getName());
+                if(varEmf.getType() == null){
+                    //emf.setType(((ArrayTypeDecl)((VariableInitializer)varEmf.getVariableList().getInitializer()).getNoNameType()).getInsideType());
+                }
+                else{
+                    emf.setType(((ArrayTypeDecl)(((UserDefinedDataType)varEmf.getType()).getTypeDeclaration())).getInsideType());
+                }
+            }
             else if(childNodeStr.equals("variable_name")){ 
                 setFromChildEmf(ctx, 0); 
             }
@@ -2107,6 +2135,33 @@ public class GenModelListener extends STBaseListener{
             else{ }
         } catch(Exception exception){
             System.err.println("Error In exitSymbolic_variable!!!");
+        }
+    }
+
+	@Override public void enterSubscript_list(STParser.Subscript_listContext ctx) { 
+        try{
+            if(getParentEmf(ctx) instanceof Namespace) setFromParentEmf(ctx);
+            else{
+                System.err.println("Error: no Namespace in ParentNode in enterSubscript_list!!!");
+            }
+            //System.out.println(((Namespace)getEmf(ctx)).getNamespace().getPOU().getName());
+        } catch(Exception exception){
+            System.err.println("Error In enterSubscript_list!!!");
+        }
+    }
+
+	@Override public void exitSubscript_list(STParser.Subscript_listContext ctx) { 
+        try{
+            SubscriptList emf = varFactory.createSubscriptList();
+            mapEmf.put(ctx, emf);
+            for(int i = 0; i < ctx.getChildCount(); i++){
+                String childNodeStr = mapNodeStr.get(ctx.getChild(i));
+                if(childNodeStr.equals("expression")){
+                    emf.getSubscript().add((Expression)mapEmf.get(ctx.getChild(i)));
+                }
+            }
+        } catch(Exception exception){
+            System.err.println("Error In exitSubscript_list!!!");
         }
     }
 
