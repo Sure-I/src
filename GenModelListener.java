@@ -221,7 +221,7 @@ public class GenModelListener extends STBaseListener{
                     emf.getDeclaration().add((Declaration)mapEmf.get(ctx.getChild(i)));
                 }
             }
-            System.out.println(emf.getDeclaration().size());
+            //System.out.println(emf.getDeclaration().size());
         }catch(Exception exception){
             System.err.println("Error in exitAll_decl!!!");
         }
