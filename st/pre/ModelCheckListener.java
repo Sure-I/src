@@ -47,25 +47,23 @@
 /////////////////*/
 
 ///////////////////////////////////////////////////////////////////////////////////////////////// */
+package st.pre;
+
+import parser.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.antlr.v4.codegen.model.decl.Decl;
-import org.antlr.v4.parse.ANTLRParser.delegateGrammar_return;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.common.util.ECollections;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 
 import st.basics.*;
 import st.elements.*;
@@ -79,17 +77,9 @@ import st.expressions.*;
 import st.statements.*;
 
 public class ModelCheckListener extends STBaseListener{
-    //从genModelListener中提出的HaspMap存放在下列属性中
-    public Map<ParseTree, EObject> mapEmf = new HashMap<>();
-    public Map<ParseTree, String> mapNodeStr = new HashMap<>();
-    public Map<String, EObject> mapTypeEmf = new HashMap<>();
-    public Map<String, EObject> mapGlobalVarEmf = new HashMap<>();
-    public Map<String, EObject> mapGlobalFunEmf = new HashMap<>();
-    public Map<String, EObject> mapGlobalFBEmf = new HashMap<>();
-
     //////getEmf()方法，获取节点自身的emf并返回该对象
     private EObject getEmf(ParserRuleContext ctx){
-        EObject emf = mapEmf.get(ctx);
+        EObject emf = ResourceBuilder.mapEmf.get(ctx);
         return emf;
     }
 
@@ -323,7 +313,7 @@ public class ModelCheckListener extends STBaseListener{
                 declEmf = (EnumTypeDecl)typeEmf.getTypeDeclaration();
             }
 
-            QuoteValue valueEmf = (QuoteValue)mapEmf.get(ctx.getChild(2));
+            QuoteValue valueEmf = (QuoteValue)ResourceBuilder.mapEmf.get(ctx.getChild(2));
             String valueString = valueEmf.getEnumValue().getValue();
             //System.out.println(valueString);
 
@@ -343,8 +333,8 @@ public class ModelCheckListener extends STBaseListener{
 
     @Override public void exitStruct_spec_init(STParser.Struct_spec_initContext ctx) { 
         try{ 
-            StructSpecInit emf = (StructSpecInit)mapEmf.get(ctx);
-            StructTypeDecl emfTypeDecl = (StructTypeDecl)mapEmf.get(ctx.getChild(0));
+            StructSpecInit emf = (StructSpecInit)ResourceBuilder.mapEmf.get(ctx);
+            StructTypeDecl emfTypeDecl = (StructTypeDecl)ResourceBuilder.mapEmf.get(ctx.getChild(0));
             StructInit emfStructInit = emf.getStructInit();
             for(int i = 0; i < emfStructInit.getElemInit().size(); i++){
                 String elemName = emfStructInit.getElemInit().get(i).getName();
