@@ -2,7 +2,7 @@ package st;
 
 import st.pre.*;
 
-public class MainApplication {
+public class ModelGenerator {
 
     public static void main(String[] args) throws Exception { 
         ResourceBuilder.filepath = args[0]; 

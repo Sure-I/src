@@ -34,6 +34,7 @@
 package st.pre;
 
 import parser.*;
+import st.genmodel.*;
 
 import java.io.IOException;
 import java.io.PipedOutputStream;
@@ -62,98 +63,6 @@ import st.variables.*;
 import st.pous.*;
 import st.declarations.*;
 import st.expressions.*;
-import st.genmodel.GenAll_decl;
-import st.genmodel.GenAll_var_decls;
-import st.genmodel.GenArray_elem_init_value;
-import st.genmodel.GenArray_init;
-import st.genmodel.GenArray_spec;
-import st.genmodel.GenArray_spec_init;
-import st.genmodel.GenArray_type_decl;
-import st.genmodel.GenAssign_stmt;
-import st.genmodel.GenBool_literal;
-import st.genmodel.GenCase_list;
-import st.genmodel.GenCase_list_elem;
-import st.genmodel.GenCase_selection;
-import st.genmodel.GenCase_stmt;
-import st.genmodel.GenChar_literal;
-import st.genmodel.GenConstant;
-import st.genmodel.GenContinue_stmt;
-import st.genmodel.GenData_type_access;
-import st.genmodel.GenData_type_decl;
-import st.genmodel.GenDecl_common_part;
-import st.genmodel.GenDerived_fb_name;
-import st.genmodel.GenDerived_func_name;
-import st.genmodel.GenDerived_type_access;
-import st.genmodel.GenElem_type_name;
-import st.genmodel.GenElse_stmt;
-import st.genmodel.GenElsif_stmt;
-import st.genmodel.GenEnd_expr;
-import st.genmodel.GenEnum_spec;
-import st.genmodel.GenEnum_spec_init;
-import st.genmodel.GenEnum_type_decl;
-import st.genmodel.GenEnum_value;
-import st.genmodel.GenExit_stmt;
-import st.genmodel.GenExpression;
-import st.genmodel.GenFb_decl;
-import st.genmodel.GenFb_instance_name;
-import st.genmodel.GenFor_list;
-import st.genmodel.GenFor_stmt;
-import st.genmodel.GenFunc_call;
-import st.genmodel.GenFunc_decl;
-import st.genmodel.GenFunc_name;
-import st.genmodel.GenIf_stmt;
-import st.genmodel.GenInt_literal;
-import st.genmodel.GenInvocation;
-import st.genmodel.GenIo_var_decls;
-import st.genmodel.GenIteration_stmt;
-import st.genmodel.GenMethod_decl;
-import st.genmodel.GenMethod_name;
-import st.genmodel.GenNumeric_literal;
-import st.genmodel.GenParam_assign;
-import st.genmodel.GenProg_decl;
-import st.genmodel.GenProg_name;
-import st.genmodel.GenQuote_value;
-import st.genmodel.GenRepeat_stmt;
-import st.genmodel.GenReturn_stmt;
-import st.genmodel.GenSelection_stmt;
-import st.genmodel.GenSimple_spec_init;
-import st.genmodel.GenStart_expr;
-import st.genmodel.GenStatements;
-import st.genmodel.GenStep_stmt;
-import st.genmodel.GenStmt;
-import st.genmodel.GenString_type_access;
-import st.genmodel.GenStruct_elem_decl;
-import st.genmodel.GenStruct_elem_init;
-import st.genmodel.GenStruct_elem_name;
-import st.genmodel.GenStruct_init;
-import st.genmodel.GenStruct_spec;
-import st.genmodel.GenStruct_spec_init;
-import st.genmodel.GenStruct_type_decl;
-import st.genmodel.GenSubprog_ctrl_stmt;
-import st.genmodel.GenSubrange;
-import st.genmodel.GenSubrange_spec;
-import st.genmodel.GenSubrange_spec_init;
-import st.genmodel.GenSubrange_type_decl;
-import st.genmodel.GenSubscript_list;
-import st.genmodel.GenSymbolic_variable;
-import st.genmodel.GenTime_literal;
-import st.genmodel.GenType_access;
-import st.genmodel.GenType_decl;
-import st.genmodel.GenType_decl_list;
-import st.genmodel.GenType_name;
-import st.genmodel.GenVar_access_decls;
-import st.genmodel.GenVar_decls;
-import st.genmodel.GenVar_external_decls;
-import st.genmodel.GenVar_global_decls;
-import st.genmodel.GenVar_in_out_decls;
-import st.genmodel.GenVar_input_decls;
-import st.genmodel.GenVar_output_decls;
-import st.genmodel.GenVar_temp_decls;
-import st.genmodel.GenVariable;
-import st.genmodel.GenVariable_list;
-import st.genmodel.GenVariable_name;
-import st.genmodel.GenWhile_stmt;
-import st.statements.*;
 
 public class GenModelListener extends STBaseListener{
 
@@ -318,7 +227,7 @@ public class GenModelListener extends STBaseListener{
     }
 
 	@Override public void enterStep_expr(STParser.Step_exprContext ctx) { 
-        GenStep_stmt.exit(ctx);
+        GenStep_expr.exit(ctx);
     }
 
     @Override public void enterWhile_stmt(STParser.While_stmtContext ctx) { 

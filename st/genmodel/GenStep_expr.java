@@ -13,7 +13,7 @@ import st.declarations.*;
 import st.expressions.*;
 import st.statements.*;
 
-public class GenStep_stmt {
+public class GenStep_expr {
     public static void enter(STParser.Step_exprContext ctx){
 
     }
