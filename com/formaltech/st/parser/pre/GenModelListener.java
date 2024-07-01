@@ -34,11 +34,12 @@
 package com.formaltech.st.parser.pre;
 
 import parser.*;
-import com.formaltech.st.parser.genmodel.*;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
+
+import com.formaltech.st.parser.generator.*;
 
 public class GenModelListener extends STBaseListener{
 

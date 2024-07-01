@@ -6,6 +6,9 @@ package com.formaltech.st.parser.pre;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.antlr.v4.runtime.CharStream;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.eclipse.emf.ecore.EObject;
 
@@ -50,8 +53,12 @@ public final class ResourceBuilder {
     public static Map<String, EObject> mapGlobalFBEmf = new HashMap<>();
 
     private ResourceBuilder(String filepath) throws Exception{
-        GenAST.generate(filepath);
-        tree = GenAST.tree;
+
+        CharStream stream = CharStreams.fromFileName(filepath);
+        STLexer lexer = new STLexer(stream);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        STParser parser = new STParser(tokens);
+        tree = parser.program();
     }
 
     public static void initResource() throws Exception{

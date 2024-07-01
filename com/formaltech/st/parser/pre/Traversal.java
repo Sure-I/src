@@ -11,8 +11,8 @@ import parser.STListener;
 public final class Traversal {
     private ParseTreeWalker myWalker = new ParseTreeWalker();
 
-    public void travelsal(STListener listener){
-        myWalker.walk(listener, ResourceBuilder.tree);
+    public void travelsal(GenModelListener genModelListener){
+        myWalker.walk(genModelListener, ResourceBuilder.tree);
     }
 
 //////setFromChildEmf()方法，获取某个子节点的emf并关联

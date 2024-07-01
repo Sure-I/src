@@ -11,7 +11,7 @@ public class ModelGenerator {
         try{
             Model model = STModelReader.load(filepath);
 
-            System.out.println(model.getSubmodels().size());
+            System.out.println(model.getDeclarations().size());
         } catch(Exception exception){
             System.err.println("Error In ModelGenerator!!!");
         }
