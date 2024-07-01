@@ -16,11 +16,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 public class GenExpression {
     public static void enter(STParser.ExpressionContext ctx){
         try{
-            if(Traversal.getParentEmf(ctx) instanceof Namespace) Traversal.setFromParentEmf(ctx);
-            else{
-                //System.err.println("no namespace in parentNode in Expression");
-            }
-            //System.out.println(((Namespace)Traversal.getEmf(ctx)).getNamespace().getPOU().getName());
+
         } catch(Exception exception){
             System.err.println("Error In enterExpression!!!");
         }
@@ -31,7 +27,7 @@ public class GenExpression {
 
     public static void exit(STParser.ExpressionContext ctx){ 
         try{
-            ParseTree childNode = ctx.getChild(0);
+/*             ParseTree childNode = ctx.getChild(0);
 
             if(childNode instanceof ErrorNode){ 
 
@@ -127,7 +123,6 @@ public class GenExpression {
             else if( ResourceBuilder.mapNodeStr.get(ctx.getChild(0)) == "constant" ){
                 LiteralOp emf = ResourceBuilder.exprFactory.createLiteralOp();
                 ResourceBuilder.mapEmf.put(ctx, emf);
-
             }
             else if( ResourceBuilder.mapNodeStr.get(ctx.getChild(0)) == "variable" ){
 
@@ -138,7 +133,7 @@ public class GenExpression {
             else if( ResourceBuilder.mapNodeStr.get(ctx.getChild(0)) == "quote_value" ){ 
 
             }
-            else{ }
+            else{ } */
         } catch(Exception exception){
             System.err.println("Error In exitExpression!!!");
         }

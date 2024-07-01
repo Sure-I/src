@@ -1,20 +1,17 @@
 package com.formaltech.st.parser;
 
-import com.formaltech.st.parser.pre.*;
+import com.formaltech.st.parser.util.*;
+import com.formaltech.st.api.Model;
 
 public class ModelGenerator {
 
     public static void main(String[] args) throws Exception { 
-        ResourceBuilder.filepath = args[0]; 
-        ResourceBuilder.initResource();
+        String filepath = args[0]; 
 
         try{
-            Traversal visitor = new Traversal();
-            
-            //模型实例化
-            GenModelListener genModelListener = new GenModelListener();
-            visitor.travelsal(genModelListener);
+            Model model = STModelReader.load(filepath);
 
+            System.out.println(model.getSubmodels().size());
         } catch(Exception exception){
             System.err.println("Error In ModelGenerator!!!");
         }

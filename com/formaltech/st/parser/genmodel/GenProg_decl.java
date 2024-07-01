@@ -14,7 +14,8 @@ import org.antlr.v4.runtime.tree.ParseTree;
 public class GenProg_decl {
     public static void enter(STParser.Prog_declContext ctx){
         try{
-
+            Program emf = ResourceBuilder.declFactory.createProgram();
+            ResourceBuilder.mapEmf.put(ctx, emf);
         }catch(Exception exception){
             System.err.println("Error in enterProg_decl!!!");
         }
@@ -32,7 +33,7 @@ public class GenProg_decl {
                     case "all_var_decls":
                         break;
                     case "statements":
-                        emf.setStatements(((Statements)(ResourceBuilder.mapEmf.get(ctx.getChild(i)))));
+
                         break;
                     default:
                         break;

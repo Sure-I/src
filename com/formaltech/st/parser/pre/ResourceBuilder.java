@@ -11,6 +11,7 @@ import org.eclipse.emf.ecore.EObject;
 
 import parser.GenAST;
 
+import com.formaltech.st.api.Model;
 import com.formaltech.st.api.ApiFactory;
 import com.formaltech.st.api.basics.BasicsFactory;
 import com.formaltech.st.api.declarations.DeclarationsFactory;
@@ -23,6 +24,8 @@ public final class ResourceBuilder {
 
     public static String filepath;
     public static ParseTree tree;
+
+    public static Model model;
 
 /* ///引入EMF模型的factory方法，用于给节点创建语言模型实例 */
     public static ApiFactory apiFactory = ApiFactory.eINSTANCE;  

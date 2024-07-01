@@ -13,7 +13,8 @@ import com.formaltech.st.api.statements.*;
 public class GenFunc_decl {
     public static void enter(STParser.Func_declContext ctx){
         try{ 
-
+            Function emf = ResourceBuilder.declFactory.createFunction();
+            ResourceBuilder.mapEmf.put(ctx, emf);
         } catch(Exception exception){
             System.err.println("Error in enterFunc_decl!!!");
         }

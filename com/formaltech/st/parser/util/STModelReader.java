@@ -1,5 +1,7 @@
 package com.formaltech.st.parser.util;
 
+import org.eclipse.core.internal.runtime.ResourceTranslator;
+
 import com.formaltech.st.api.Model;
 import com.formaltech.st.parser.pre.GenModelListener;
 import com.formaltech.st.parser.pre.ResourceBuilder;
@@ -16,9 +18,8 @@ public class STModelReader {
         ResourceBuilder.initResource();
 
         try{
-            Traversal visitor = new Traversal();
-            
             //模型实例化
+            Traversal visitor = new Traversal();
             GenModelListener genModelListener = new GenModelListener();
             visitor.travelsal(genModelListener);
 
@@ -26,7 +27,7 @@ public class STModelReader {
             System.err.println("Error In MainApplication!!!");
         }
 
-        return null;
+        return ResourceBuilder.model;
 
     }
 

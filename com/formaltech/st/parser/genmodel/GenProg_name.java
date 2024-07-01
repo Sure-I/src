@@ -25,7 +25,7 @@ public class GenProg_name {
             String parentNodeStr = ResourceBuilder.mapNodeStr.get(ctx.getParent());
             switch(parentNodeStr){
                 case "program_decl":
-                    ResourceBuilder.mapEmf.put(ctx.getParent(), emf);
+                    //ResourceBuilder.mapEmf.put(ctx.getParent(), emf);
                     break;
                 default:
                     break;

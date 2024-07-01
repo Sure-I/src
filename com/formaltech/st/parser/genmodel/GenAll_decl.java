@@ -27,6 +27,9 @@ public final class GenAll_decl {
                 }
             }
             //System.out.println(emf.getDeclaration().size());
+
+
+            ResourceBuilder.model = emf;
         }catch(Exception exception){
             System.err.println("Error in exitAll_decl!!!");
         }
